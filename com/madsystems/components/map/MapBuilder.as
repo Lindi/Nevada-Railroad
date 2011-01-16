@@ -2,7 +2,6 @@
 {
 	import com.madsystems.components.Builder;
 	import com.madsystems.components.ComponentFactory;
-	
 	import flash.display.Bitmap;
 	import flash.display.DisplayObjectContainer;
 	

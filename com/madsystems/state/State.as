@@ -5,6 +5,9 @@
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
+	import mx.core.UIComponent;
+	import flash.display.DisplayObjectContainer;
+	
 	public class State extends EventDispatcher implements IState
 	{
 		
@@ -12,12 +15,13 @@
 		public var components:Array ;
 		public var inputs:Array ;
 		public var id:String ;
-		//private var main:DisplayObjectContainer ;
+		public var component:UIComponent ;
+		public var main:DisplayObjectContainer ;
 		
-		public function State(  )
+		public function State( main:DisplayObjectContainer )
 		{
 			super( );
-			//this.main = main ;
+			this.main = main ;
 			components = new Array( );
 			inputs = new Array( );
 		}
