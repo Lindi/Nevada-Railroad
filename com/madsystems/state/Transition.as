@@ -1,17 +1,21 @@
 package com.madsystems.state
 {
-	import com.madsystems.state.event.StateEvent;
-	
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	
 	public class Transition
 	{
-		public var components:Object = new Object( ) ;
+		public var target:Object ;
+		public var name:String ;
+		public var args:Array ;
 		
-		public function next( input:Event ):void {
-			for each ( var component:EventDispatcher in components )
-				component.dispatchEvent( new StateEvent( StateEvent.NEXT ));
+		public function Transition( target:Object, name:String, args:Array )
+		{
+			this.target = target ;
+			this.name = name ;
+			this.args = args ;
+		}
+		
+		public function execute( ):void
+		{
+			( target[ name ] as Function ).apply( target, args );	
 		}
 	}
 }

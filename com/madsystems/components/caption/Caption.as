@@ -11,29 +11,23 @@ package com.madsystems.components.caption
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
+	import com.madsystems.components.Component;
 	
-	public class Caption extends Sprite
+	public class Caption extends Component
 	{
-		private var main:DisplayObjectContainer ;
 		private var textField:TextField ;
 		public var text:String ;
 		private var caption:String ;
 		private var sprite:Sprite ;
 		
-		public function Caption( main:DisplayObjectContainer, color:int ) 
+		public function Caption( color:int ) 
 		{  
 			super();
-			this.main = main ;
-			
-			//	var myFont:Satero = new Satero(); 
-			var myFont:Font = new Font();
-			
 			var format:TextFormat = new TextFormat( );
-			format.font = myFont.fontName ;
+			format.font = "Satero Serif LT Pro" ; 
 			format.bold = true ;
 			format.size = 32 ;
 			format.color = color ;
-					
 			textField = new TextField( );
 			textField.autoSize = TextFieldAutoSize.LEFT ;
 			textField.defaultTextFormat = format ;
@@ -42,24 +36,20 @@ package com.madsystems.components.caption
 			textField.wordWrap = true ;
 			textField.embedFonts = true ;
 			textField.width = 920 ;
-			textField.x = textField.y  = 80 ;
-			
+			textField.rotation = -90 ;
+			textField.x = 80 ;
+			textField.y = 1000 ;
 			sprite = new Sprite( );
-			
-
 			addEventListener( StateEvent.RUN, run );
 			addEventListener( StateEvent.NEXT, next );
 		}
-		private function run( event:Event ):void {
-			show( this );
-			caption = text.concat();
-			
+		override public function run( event:Event ):void {
+			caption = text.concat();			
 			addChild( sprite ) ;
 			addChild( textField );
 			addEventListener( Event.ENTER_FRAME, frame );
 		}
-		private function next( event:Event ):void {
-			hide( this );
+		override public function next( event:Event ):void {
 			removeChild( sprite );
 			removeChild( textField );
 			if ( hasEventListener( Event.ENTER_FRAME ))
@@ -71,35 +61,15 @@ package com.madsystems.components.caption
 			textField.appendText(caption.substr(0,1));
 			caption = caption.substring(1);
 			
-			var y:int = textField.y/2 ;
-			var h:int = ( textField.y - textField.y/2 );
+			var x:int = textField.x/2 ;
+			var w:int = ( textField.x - textField.x/2 );
 			sprite.graphics.clear();
 			sprite.graphics.beginFill( 0xffffff, .2);
-			sprite.graphics.drawRect( 0, y, stage.stageWidth, 2 * h + textField.textHeight );
+			sprite.graphics.drawRect( x, 0, 2 * w + textField.textHeight, stage.stageHeight );
 			sprite.graphics.endFill();
 			if ( !caption.length ) {
 				removeEventListener( Event.ENTER_FRAME, frame );
 				dispatchEvent( new Event( Event.COMPLETE ));
-			}
-		}
-		private function hide( displayObject:DisplayObject ):void {
-			if ( !displayObject )
-				return ;
-			if ( main.contains( displayObject )) {
-				main.removeChild( displayObject ) ;
-			}			
-		}
-		private function show( displayObject:DisplayObject ):void {
-			if ( !displayObject )
-				return ;
-			if ( !main.contains( displayObject )) {
-				if ( displayObject.parent is DisplayObjectContainer ) 
-					main.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), main.numChildren);
-				else {
-					main.addChildAt( displayObject, main.numChildren);
-				} 
-			} else {
-				main.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), main.numChildren);
 			}
 		}
 	}

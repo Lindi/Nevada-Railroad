@@ -122,7 +122,7 @@
 						//	Extract the bitmap data 
 						var loaderInfo:LoaderInfo = ( event.target as LoaderInfo ) ; 
 						var bitmap:Bitmap = ( loaderInfo.content as Bitmap ) ;
-						map = new Map( main, files, bitmap ) ;//, url, 2335.71, 2808 );
+						map = new Map( files, bitmap, bitmap.width, bitmap.height ) ;//, url, 2335.71, 2808 );
 						main.addChild( map ) ;
 						
 						//	Remove the listener

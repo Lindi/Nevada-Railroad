@@ -15,6 +15,8 @@
 		public var location:Point ;
 		private var thickness:int ;
 		private var color:Number ;
+		public var id:String ;
+		public var enabled:Boolean = true ;
 		public var rectangle:Rectangle = new Rectangle( );
 		
 		public function Path( paths:Array, sprite:Sprite, properties:Object )
@@ -22,6 +24,7 @@
 			this.paths = paths ;
 			if ( properties.reverse )
 				paths.reverse();
+			this.id = properties.id ;
 			this.sprite = sprite ;
 			this.location = new Point( );
 			this.s = s ;

@@ -11,12 +11,12 @@
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
+	import com.madsystems.components.Component;
 	
-	public class Slideshow extends Sprite
+	public class Slideshow extends Component
 	{
 		public var images:Array = new Array( );
 		private var tween:Tween ;
-		private var main:DisplayObjectContainer ;
 		private var index:int = 0 ;
 		private var a:Bitmap ;
 		private var b:Bitmap ;
@@ -27,8 +27,7 @@
 				addChild( bitmap );
 			images.push( bitmap );
 		}
-		public function Slideshow( main:DisplayObjectContainer ) {
-			this.main = main ;
+		public function Slideshow(  ) {
 			//	Create tweens and listeners
 			tween = new Tween( {}, "", None.easeNone, 0, 1, 5, true ) ;
 			tween.addEventListener( TweenEvent.MOTION_START, start );
@@ -38,18 +37,12 @@
 			addEventListener( StateEvent.RUN, run );				
 			addEventListener( StateEvent.NEXT, next ) ;
 		}
-		private function run( event:StateEvent ):void {
-			trace("slideshow.run("+event+")");
-			if ( !main.contains( this ))
-				main.addChild( this );
+		override public function run( event:Event ):void {
 			index = 0 ;
 			tween.start();
 		}
-		private function next( event:StateEvent ):void {
-			trace("slideshow.next("+event+")");
+		override public function next( event:Event ):void {
 			tween.stop( );
-			if ( main.contains( this ))
-				main.removeChild( this );	
 			addChild( images[ 0 ] as Bitmap );		
 		}
 		private function start( event:TweenEvent ):void {

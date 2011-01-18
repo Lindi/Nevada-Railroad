@@ -20,9 +20,9 @@
 		private var cars:Array = new Array( );
 
 		
-		public function Loop(main:DisplayObjectContainer=null)
+		public function Loop( )
 		{
-			super(main);
+			super( );
 			addEventListener( StateEvent.RUN, run );
 			addEventListener( StateEvent.NEXT, next ) ;
 			timer = new Timer( 100 );
@@ -31,11 +31,10 @@
 		public function add( bitmap:Bitmap, name:String ):void 
 		{
 			this[ name ] = bitmap ;
-			
 		}
 	
 	
-		override protected function run( event:StateEvent ):void {
+		override public function run( event:Event ):void {
 			if ( bitmap && background ) {
 				if ( bitmap.bitmapData && background.bitmapData ) {
 					init( );
@@ -54,7 +53,7 @@
 				}
 			}			
 		}
-		override protected function next( event:StateEvent ):void {
+		override public function next( event:Event ):void {
 			if ( timer )
 				timer.stop() ;
 			if ( cars.length ) {
@@ -66,7 +65,6 @@
 		
 		private function init( ):void {
 			
-			show( this ) ;
 			if ( !contains( background ))
 				addChild( background ) ;
 				
@@ -74,17 +72,17 @@
 				cars.push( addChild( bitmap )) ;
 				bitmap.blendMode = BlendMode.MULTIPLY ;
 				bitmap.alpha = .9 ;
-				bitmap.x = ( main.stage.stageWidth - bitmap.width )/2 ;
+				bitmap.x = ( stage.stageWidth - bitmap.width )/2 ;
 				bitmap.visible = false ;
 				while ( cars.length < 3 ) {
 					cars.push( addChild( new Bitmap( bitmap.bitmapData.clone())));
 					var car:Bitmap = cars[ cars.length - 1] as Bitmap ;
 					car.blendMode = BlendMode.MULTIPLY ;
 					car.alpha = .9 ;
-					car.x = ( main.stage.stageWidth - bitmap.width )/2 ;
+					car.x = ( stage.stageWidth - bitmap.width )/2 ;
 					car.visible = false ;
 				}
-				index = main.stage.stageHeight ;
+				index = stage.stageHeight ;
 			}
 			
 			timer.delay = 5000 ;
@@ -107,7 +105,7 @@
 			}
 			if ( car.y < -car.height ) {
 				removeEventListener( Event.ENTER_FRAME, frame );
-				index = main.stage.stageHeight ;
+				index = stage.stageHeight ;
 				timer.start( );
 			}
 		}

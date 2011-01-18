@@ -15,12 +15,7 @@
 			var id:String = ( object.id as String ) ;
 			if ( components[ id ] is Loop ) 
 				return components[ id ] ;
-				
-			trace( id );
-			trace("LoopBuilder.create("+components[ id ]+")");
-				
-			var main:DisplayObjectContainer = ( object.container as DisplayObjectContainer );
-			loop = new Loop( main );
+			loop = new Loop( );
 			return null ;
 		}
 		

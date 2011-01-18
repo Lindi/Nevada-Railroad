@@ -4,9 +4,9 @@ package com.madsystems.components
 
 	public class AttractLoop extends Component
 	{
-		public function AttractLoop(main:DisplayObjectContainer=null)
+		public function AttractLoop( )
 		{
-			super(main);
+			super( );
 		}
 		
 	}

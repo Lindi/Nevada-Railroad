@@ -2,6 +2,8 @@
 {
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
 	
 
 	public class StateMachine 
@@ -16,10 +18,7 @@
 			main.addEventListener( Event.COMPLETE,
 				function ( event:Event ):void {
 					main.removeEventListener( Event.COMPLETE, arguments.callee );
-					for each ( var input:Object in state.inputs ) {
-						if ( !state.hasEventListener( input.type ))
-							state.addEventListener( input.type, next );
-					}
+					addEventListeners( state );
 					state.run();
 				});
 		}
@@ -27,6 +26,27 @@
 		public function add( id:String, state:IState ):void {
 			if ( !states[ id ] )
 				states[ id ] = state ;
+		}
+		
+		private function addEventListeners( state:State ):void {
+			for ( var type:String in state.inputs ) {
+				var inputs:Array = state.inputs[ type ] as Array ;
+				for each ( var target:Object in inputs ) {
+					var component:IEventDispatcher = ( state.components[ target.component ] as IEventDispatcher ); 
+					if ( component )
+						component.addEventListener( type, next );					
+				} 
+			}
+		}		
+		private function removeEventListeners( state:State ):void {
+			for ( var type:String in state.inputs ) {
+				var inputs:Array = state.inputs[ type ] as Array ;
+				for each ( var target:Object in inputs ) {
+					var component:IEventDispatcher = ( state.components[ target.component ] as IEventDispatcher ); 
+					if ( component )
+						component.removeEventListener( type, next );					
+				} 
+			}
 		}
 
 		public function next( input:Event ):void {
@@ -42,20 +62,15 @@
 				//	of the type of component, or we should store the component
 				//	id and test for the id of the component that dispatched
 				//	the event
-				for each ( var event:Object in state.inputs ) {
-					if ( !state.hasEventListener( event.type ))
-						state.removeEventListener( event.type, arguments.callee );
-				}
+				removeEventListeners( state );
 
 				//	Store a reference to the new state
 				state = states[ next ] ;
-							trace( "next("+state.id+")");
 
 				//	Now listen to the events in this state
-				for each ( event in state.inputs ) {
-					if ( !state.hasEventListener( event.type ))
-						state.addEventListener( event.type, arguments.callee );
-				}
+				addEventListeners( state ) ;
+				
+				//	Rune the state
 				state.run( ) ;
 			}
 		}

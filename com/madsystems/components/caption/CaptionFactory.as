@@ -12,12 +12,12 @@
 			if ( !builder )
 				builder = new CaptionBuilder( );
 			var id:String = component.@id.toString();
-			var object:Object = builder.create( { container: main, id: id } );
+			var color:Number = Number( component.@color.toString( ));
+			var object:Object = builder.create( { id: id, color: color } );
 			if ( object )
 				return object ;
 			return builder.build( component ) ;
 		}
-
 		ComponentFactory.add("caption", new CaptionFactory( ));
 	}
 }
@@ -37,13 +37,11 @@ class CaptionBuilder extends Builder
 
 		if ( components[ id ] is Caption ) 
 			return components[ id ] ;
-		trace( id );
-		trace("CaptionBuilder.create("+components[ id ]+")");
 			
 		var color:int = int( object.color );
-		var main:DisplayObjectContainer = ( object.container as DisplayObjectContainer )
+
 		//	Create a bitmap reference to be returned synchrononously
-		caption = new Caption( main, color );
+		caption = new Caption( color );
 		return null ;
 	}
 	override public function build( component:XML ):Object {
@@ -63,16 +61,10 @@ class CaptionBuilder extends Builder
 		var i:int = 0 ;
 		while (( i = string.search(/[\r\n\t]/)) != -1 )
 			string = string.substr( 0, i ) + string.substr( i+1 );
-//			
-//		//	Strip blocks of non-word characters
-//		while (( i = string.search(/^\W*\w+/)) != -1 )
-//			string = string.substr( 0, i ) + string.substr( i+1 );
 		
 					
 		//	Return the slideshow
 		caption.text = string ;
-				trace( 'caption ' + string ) ;
-
 		return caption ;	
 	}
 }

@@ -12,7 +12,7 @@ package com.madsystems.components.slideshow
 			if ( !builder )
 				builder = new SlideshowBuilder( );
 			var id:String = component.@id.toString();
-			var object:Object = builder.create( { container: main, id: id } );
+			var object:Object = builder.create( { id: id } );
 			if ( object )
 				return object ;
 			return builder.build( component ) ;
@@ -40,22 +40,17 @@ class SlideshowBuilder extends Builder
 		if ( components[ id ] is Slideshow ) {
 			return components[ id ] ;
 		}
-			
-		var main:DisplayObjectContainer = ( object.container as DisplayObjectContainer ) ;
-			
+						
 		//	Create a bitmap reference to be returned synchrononously
-		slideshow = new Slideshow( main );
+		slideshow = new Slideshow(  );
 		return null ;
 	}
 	override public function build( component:XML ):Object {
 		// Return the Bitmap if we've already made it
 		if ( components[ component.@id ] is Slideshow ) 
 			return ( components[ component.@id.toString() ] as Slideshow ) ;
-			
 		//	Store a reference	
 		components[ component.@id.toString() ] = slideshow ;
-
-
 		//	Add the slideshow images 
 		for each ( var image:XML in component.image ) {
 			slideshow.add( ComponentFactory.create( image ) as Bitmap );

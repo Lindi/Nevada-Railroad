@@ -15,12 +15,11 @@
 				builder = new MapBuilder( );
 			
 			var id:String = component.@id.toString();
-			var object:Object = builder.create( { container: main, id: id } );
+			var object:Object = builder.create( { id: id } );
 			if ( object )
 				return object ;
 			return builder.build( component ) ;
 		}
-		
 		ComponentFactory.factories["map"] = new MapFactory(  ) ;
 	}
 }

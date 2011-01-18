@@ -55,7 +55,7 @@ class BitmapBuilder extends Builder
 				
 				//	Extract the bitmap data 
 				var loaderInfo:LoaderInfo = ( event.target as LoaderInfo ) ; 
-				bitmap.bitmapData = ( loaderInfo.content as Bitmap ).bitmapData ;
+				( components[ image.@id ] as Bitmap ).bitmapData = ( loaderInfo.content as Bitmap ).bitmapData ;
 				
 				//	Remove the listener
 				( event.target as LoaderInfo ).removeEventListener
@@ -66,7 +66,6 @@ class BitmapBuilder extends Builder
 		//	Silently handle errant files
 		loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR,
 			function ( event:IOErrorEvent ):void {
-				trace( event ) ;
 				( event.target as LoaderInfo ).removeEventListener
 					( IOErrorEvent.IO_ERROR, arguments.callee );
 			});

@@ -2,19 +2,17 @@
 {
 	import com.madsystems.components.Builder;
 	import com.madsystems.components.ComponentFactory;
+	
 	import flash.display.Bitmap;
-	import flash.display.DisplayObjectContainer;
 	
 	
 	internal class MapBuilder extends Builder
 	{
-		private var main:DisplayObjectContainer ;
 		
 		override public function create( object:Object ):Object {
 			var id:String = ( object.id as String ) ;
 			if ( components[ id ] is Map ) 
 				return components[ id ] ;
-			this.main = ( object.container as DisplayObjectContainer ) ;
 			return null ;
 		}
 		override public function build( component:XML ):Object {
@@ -29,9 +27,9 @@
 			//	Create the array of json files to be loaded by the map
 			var routes:Array = (function ( list:XMLList, array:Array ):Array {
 				for each ( var route:XML in list ) {
-					if ( route.children().length())
+					if ( route.children().length()) {
 						array.push( arguments.callee( route.children(), [] ));
-					else {
+					} else {
 						var url:String = route.@url.toString();
 						var reverse:Boolean = ( route.@reverse.toString() == "true" );
 						var color:Number = Number( route.@color.toString() );
@@ -47,11 +45,11 @@
 			//	Create the map
 			var image:XML = ( component.image as XMLList )[0] ; 
 			var bitmap:Bitmap = ComponentFactory.create( image ) as Bitmap;
-			map = new Map( main, routes, bitmap );
-			
-			//	Return the map 
+			var width:Number = Number( component.@width.toString( ));
+			var height:Number = Number( component.@height.toString( ));
+			var speed:Number = Number( component.@speed.toString( ));
+			components[ component.@id ] = map = new Map( routes, bitmap, width, height, speed );
 			return map ;
-			//return null;	
 		}
 	}
 }
