@@ -1,6 +1,5 @@
 ﻿package com.madsystems.state
 {
-	import com.madsystems.components.Component;
 	import com.madsystems.components.ComponentFactory;
 	
 	import flash.display.DisplayObjectContainer;
@@ -57,17 +56,12 @@
 			//	Build the components
 			var components:Object = new Object( );
 			for each ( var node:XML in application.components.* ) {
-				components[ node.@id ] = new Object( );
-				for each ( var child:XML in node.children()) {
-					var component:XML = ( application.* ).child(child.@type.toString()).(@id == child.@id)[0]; 
-					if (!( components[ node.@id ] ))
-						components[ node.@id ] = new Object( );	
-					components[ node.@id ][ child.@id ] = ComponentFactory.create( component ) ;
-					
-					//	Set the component id
-					//	This will be used by the state to determine which component issued an event
-					if ( components[ node.@id ][ child.@id ] is Component )
-						( components[ node.@id ][ child.@id ] ).id = child.@id.toString( );
+				components[ node.@id ] = new Array( );
+				for ( var i:int = 0; i < node.children().length(); i++ ) { //each ( var child:XML in node.children()) {
+					var child:XML = node.children()[ i] as XML;
+					var component:XML = ( application.* ).child(child.@type.toString()).(@id == child.@id)[0];
+					var display:Object =  ComponentFactory.create( component ) ;
+					( components[ node.@id ] as Array ).push( { id: child.@id.toString( ), component: display });
 				}
 			}
 			
@@ -89,10 +83,11 @@
 				//	Push the components on to the components array and
 				//	define a property on the state components array for
 				//	easy access to the component	
-				for ( var id:String in components[ state.@id.toString() ] ) {
+				var a:Array = components[ state.@id.toString() ] as Array ;
+				for ( i = 0; i < a.length; i++ ) { 
 					var array:Array = ( stateMachine.states[ state.@id ] as State ).components ;
-					array.push( components[ state.@id ][ id ] );
-					array[ id ] = components[ state.@id ][ id ] ;
+					array.push( a[i].component ) ;
+					array[ a[i].id ] = a[i].component ;
 				}	
 					
 				

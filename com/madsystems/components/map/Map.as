@@ -18,7 +18,7 @@ package com.madsystems.components.map
 		public var paths:Array ;
 		public var maps:Array ;
 		private var index:int = 0 ;
-		internal var sprite:Sprite = new Sprite() ;
+		internal var sprite:Sprite ;
 		private var tween:Tween ;
 		private var point:Point ;
 		private var speed:Number ;
@@ -45,6 +45,9 @@ package com.madsystems.components.map
 			//	Listen for state events
 			addEventListener( StateEvent.RUN, run ) ;
 			addEventListener( StateEvent.NEXT, next );
+			
+			//	The paths will draw on this 
+			sprite = addChild( new Sprite( )) as Sprite ;
 
 			//	Keep track of the number of loaders
 			var loaders:int ;
@@ -113,8 +116,6 @@ package com.madsystems.components.map
 			trace("run("+event+")");
 			if ( !hasEventListener( Event.ENTER_FRAME ))
 				addEventListener( Event.ENTER_FRAME, frame );			
-			if ( !contains( sprite ))
-				addChild( sprite );
 			if ( tween ) {
 				tween.addEventListener( TweenEvent.MOTION_CHANGE, animate );
 				tween.addEventListener( TweenEvent.MOTION_FINISH, animate );

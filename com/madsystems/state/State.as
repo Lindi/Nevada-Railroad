@@ -91,6 +91,10 @@
 				if ( next ) {
 					main.removeChild( uicomponent );
 					
+					//	Take the kids out
+					for each ( var child:DisplayObject in uicomponent )
+						hide( child, uicomponent );
+					
 					//	Kill the timeout timer if there is one
 					if ( timer )
 						timer.stop();
@@ -119,15 +123,15 @@
 		 * display object in the main display object container
 		 **/ 
 		private function show( displayObject:DisplayObject, container:DisplayObjectContainer, index:int ):void {
-			if ( !container )
-				return ;
-			if ( !displayObject )
-				return ;
-			if ( !container.contains( displayObject )) {
+			trace("show("+displayObject+","+index+")");
+			//displayObject.visible = !( displayObject is Bitmap );
+				
+			//if ( !container.contains( displayObject )) {
 				if ( displayObject.parent is DisplayObjectContainer ) 
 					container.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), index )
 				else container.addChildAt( displayObject, index );
-			}
+			//}
+			trace("show("+container.getChildIndex( displayObject )+")");
 		}
 		/**
 		 * hide
@@ -135,10 +139,10 @@
 		 * Removes a display object from the main display object container
 		 **/ 
 		private function hide( displayObject:DisplayObject, container:DisplayObjectContainer ):void {
-			if ( !container )
-				return ;
-			if ( !displayObject )
-				return ;
+//			if ( !container )
+//				return ;
+//			if ( !displayObject )
+//				return ;
 			if ( container.contains( displayObject )) {
 				container.removeChild( displayObject ) ;
 			}			
