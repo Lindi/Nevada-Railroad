@@ -6,6 +6,7 @@ package com.madsystems.state.event
 	{
 		public static const RUN:String = "run" ;
 		public static const NEXT:String = "next" ;
+		public static const TIMEOUT:String = "timeout" ;
 		
 		public function StateEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

@@ -4,6 +4,7 @@
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
+	import com.madsystems.state.event.StateEvent ;
 	
 
 	public class StateMachine 
@@ -37,6 +38,10 @@
 						component.addEventListener( type, next );					
 				} 
 			}
+			
+			//	Listen for a state timeout
+			if ( state.timer )
+				state.addEventListener( StateEvent.TIMEOUT, next );
 		}		
 		private function removeEventListeners( state:State ):void {
 			for ( var type:String in state.inputs ) {
@@ -47,6 +52,10 @@
 						component.removeEventListener( type, next );					
 				} 
 			}
+			
+			//	Remove the timeout listener
+			if ( state.timer )
+				state.removeEventListener( StateEvent.TIMEOUT, next );
 		}
 
 		public function next( input:Event ):void {

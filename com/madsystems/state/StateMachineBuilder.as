@@ -1,12 +1,14 @@
 ﻿package com.madsystems.state
 {
+	import com.madsystems.components.Component;
 	import com.madsystems.components.ComponentFactory;
+	
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
-	import flash.utils.getDefinitionByName ;
+	import flash.utils.getDefinitionByName;
 	
 	public class StateMachineBuilder extends EventDispatcher
 	{
@@ -28,20 +30,14 @@
 //					//	Create a factory to load the factory classes
 					var factory:ComponentFactory = ( new ComponentFactory(  )  ).initiatlize( main );
 
+					//	Listen for when it's complete
+					factory.dispatcher.addEventListener( Event.COMPLETE, complete );
+					
 					//	Grab the XML and build the states
 					build( new XML( loader.data ), main );
-					
-//					
-//					for each ( var state:XML in root.states.state ) {
-//						if ( stateMachine.states[ state.@id ] )
-//							continue ;
-//						var inputs:XMLList = state.inputs.input ;
-//						var components:XMLList = state.components.component ;
-//						create( state, main ).build( stateMachine.states[ state.@id ] as State, inputs, components, root );
-//					}
-					
+										
 					//	We're done now
-					dispatchEvent( new Event( Event.COMPLETE ));
+					//dispatchEvent( new Event( Event.COMPLETE ));
 				};
 				
 			//	Load the state xml configuration
@@ -55,18 +51,6 @@
 			}
 		}
 
-//		private function create( state:XML, main:DisplayObjectContainer ):StateMachineBuilder {
-//			//	Create the new state
-//			stateMachine.states[ state.@id ] = new State( main );
-//			
-//			//	Set its id
-//			( stateMachine.states[ state.@id ] as State ).id = state.@id.toString();
-//			
-//			trace( "state.@initialState.toString() " + state.@initialState.toString());
-//			if ( state.@initialState.toString() == "yes" )
-//				stateMachine.state = ( stateMachine.states[ state.@id ] as State ) ;
-//			return this ;			
-//		}
 		private function build( application:XML, main:DisplayObjectContainer ):void { //state:State, inputs:XMLList, components:XMLList, root:XML ):StateMachineBuilder {
 			
 			
@@ -82,19 +66,23 @@
 					
 					//	Set the component id
 					//	This will be used by the state to determine which component issued an event
-					( components[ node.@id ][ child.@id ] ).id = child.@id.toString( );
+					if ( components[ node.@id ][ child.@id ] is Component )
+						( components[ node.@id ][ child.@id ] ).id = child.@id.toString( );
 				}
 			}
 			
 			//	Build the states
 			for each ( var state:XML in application.states.* ) {
-				//	Create the new state
-				stateMachine.states[ state.@id ] = new State( main );
 				
+				//	Create the new state
+				if ( state.@timeout ) 
+					stateMachine.states[ state.@id ] = new State( main, Number( state.@timeout.toString()));
+				else stateMachine.states[ state.@id ] = new State( main );
+
 				//	Set its id
 				( stateMachine.states[ state.@id ] as State ).id = state.@id.toString();
 				
-				//	trace( "state.@initialState.toString() " + state.@initialState.toString());
+				//	Store the initial state
 				if ( state.@initialState.toString() == "yes" )
 					stateMachine.state = ( stateMachine.states[ state.@id ] as State ) ;
 					
@@ -134,20 +122,11 @@
 					}
 				}
 			}
-//			for each ( var component:XML in components ) {
-//				var id:String = component.@id.toString();
-//				state.components.push
-//				( 
-//					{ 
-//						component: ComponentFactory.create( root.components.*.(@id == component.@id)[0] ),
-//					  	id: id,
-//					  	activate: ( component.@deactivate.toString() == "true" ),
-//					  	deactivate: ( component.@deactivate.toString() == "true" )
-//					}
-//				);
-//			}
-						
-			//return this ;
+		}
+		
+		//	Dispatch to main when the bitmaps have done loading
+		private function complete( event:Event ):void {
+			dispatchEvent( event.clone());
 		}
 	}
 }

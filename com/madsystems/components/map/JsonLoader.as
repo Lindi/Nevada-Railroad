@@ -11,18 +11,15 @@ package com.madsystems.components.map
 	internal class JsonLoader extends EventDispatcher {
 	
 	private var paths:Array ;
-	private var reverse:Boolean ;
 
-	public function queue( files:Array, reverse:Boolean ):Array {
+	public function queue( files:Array ):Array {
 		this.paths = new Array( ) ;
-		this.reverse = reverse ;
 		decode( files );
 		return paths ;
 	}
 	
-	public function load( file:String, reverse:Boolean ):Array {
+	public function load( file:String ):Array {
 		this.paths = new Array( ) ;
-		this.reverse = reverse ;
 		decode( [ file ] );
 		return paths ;
 	}
@@ -39,9 +36,7 @@ package com.madsystems.components.map
 				var json:String = ( loader.data as String );
 				var object:Object = JSON.decode( json )  ;
 				for each ( var e:Object in object ) {
-					if ( reverse )
-						paths.unshift( e );
-					else paths.push( e );					
+					paths.push( e );					
 				}
 				loader.removeEventListener( event.type, arguments.callee );
 				if ( files.length )

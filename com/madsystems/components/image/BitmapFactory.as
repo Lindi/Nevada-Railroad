@@ -2,88 +2,53 @@
 {
 	import com.madsystems.components.Builder;
 	import com.madsystems.components.ComponentFactory;
+	
+	import flash.events.Event;
+	import flash.events.IEventDispatcher;
 
 
-	public class BitmapFactory extends ComponentFactory
+	public class BitmapFactory extends ComponentFactory implements IEventDispatcher
 	{
 		private var builder:Builder ;
 	
 		override protected function create( component:XML ):Object {
-			if ( !builder )
+			if ( !builder ) {
 				builder = new BitmapBuilder( );
+				( builder as IEventDispatcher ).addEventListener( Event.COMPLETE, complete );
+			}
 			return builder.build( component ) ;
+		}
+		
+		private function complete( event:Event ):void {
+			dispatcher.dispatchEvent( event.clone());
+			( builder as IEventDispatcher ).removeEventListener( Event.COMPLETE, complete );
 		}
 
 		ComponentFactory.add("image", new BitmapFactory( ));
-		
-	}
-}
 
-import com.madsystems.components.Builder;
-import flash.display.Bitmap ;
-import flash.display.BitmapData ;
-import flash.display.Loader ;
-import flash.display.LoaderInfo ;
-import flash.events.IOErrorEvent ;
-import flash.events.Event ;
-import flash.net.URLRequest ;
-
-//	We probably have to move this inside the public class
-//	in order for AIR to find the definition?
-//import flash.filesystem.File ;
-
-
-class BitmapBuilder extends Builder
-{
-	
-	override public function build( image:XML ):Object {
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
+		{
+			dispatcher.addEventListener( type, listener, useCapture, priority, useWeakReference ) ;
+		}
 		
-		//	Return the Bitmap if we've already made it
-		var id:String = image.@id.toString() as String ;
-		var bitmap:Bitmap = ( components[ id ] as Bitmap ) ;
-		if ( bitmap ) 
-			return bitmap ;
-			
-		//	Create a bitmap reference to be returned synchrononously
-		bitmap = components[ image.@id ] = new Bitmap( );
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void
+		{
+			dispatcher.addEventListener( type, listener, useCapture ) ;
+		}
 		
-		//	Create a loader to load the bitmap
-		var loader:Loader = new Loader( );
-		loader.contentLoaderInfo.addEventListener( Event.COMPLETE, 
-			function ( event:Event ):void {
-				trace( "build("+event+")");
-				
-				//	Extract the bitmap data 
-				var loaderInfo:LoaderInfo = ( event.target as LoaderInfo ) ; 
-				( components[ image.@id ] as Bitmap ).bitmapData = ( loaderInfo.content as Bitmap ).bitmapData ;
-				
-				//	Remove the listener
-				( event.target as LoaderInfo ).removeEventListener
-					( Event.COMPLETE, arguments.callee );
-					
-			});
-			
-		//	Silently handle errant files
-		loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR,
-			function ( event:IOErrorEvent ):void {
-				( event.target as LoaderInfo ).removeEventListener
-					( IOErrorEvent.IO_ERROR, arguments.callee );
-			});
-		try {
-			//	Get the application directory
-			//var dir:File = File.applicationDirectory ;
-			
-			//	Get the directory for the routes
-			//var file:File = dir.resolvePath(image.@url) ;
-			
-			//	Make the file request and request it
-			var url:String = image.@url.toString();	
-			loader.load( new URLRequest( image.@url.toString( ) ));
-			
-		} catch (error:Error) {
-			trace("Unable to load requested document.");
-		}	
-		return bitmap ;
+		public function dispatchEvent(event:Event):Boolean
+		{
+			return dispatcher.dispatchEvent( event );
+		}
 		
+		public function hasEventListener(type:String):Boolean
+		{
+			return dispatcher.hasEventListener( type );
+		}
+		
+		public function willTrigger(type:String):Boolean
+		{
+			return dispatcher.willTrigger( type );
+		}		
 	}
 }

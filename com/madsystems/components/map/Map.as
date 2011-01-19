@@ -7,7 +7,7 @@ package com.madsystems.components.map
 	import fl.transitions.TweenEvent;
 	import fl.transitions.easing.None;
 	
-	import flash.display.Bitmap;
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -16,17 +16,14 @@ package com.madsystems.components.map
 	internal class Map extends Component
 	{
 		public var paths:Array ;
-		private var map:Bitmap ;
+		public var maps:Array ;
 		private var index:int = 0 ;
-		private var sprite:Sprite = new Sprite() ;
-		private var tween:Object = new Object( );
-		//private var tiles:Tiles ;
+		internal var sprite:Sprite = new Sprite() ;
+		private var tween:Tween ;
 		private var point:Point ;
-		//private var w:int ;
-		//private var h:int ;
 		private var speed:Number ;
 		private var zoom:Number ;
-		public var scale:Number ;
+		private var scale:Number ;
 		private var location:Point ;
 		
 		internal static const MAP_WINDOW_WIDTH:int = 1920 ;
@@ -34,19 +31,20 @@ package com.madsystems.components.map
 		private var MAP_WIDTH:int ;
 		private var MAP_HEIGHT:int ;
 		
-		public function Map( files:Array, map:Bitmap, width:Number, height:Number, speed:Number = .25 )//, url:String, w:int, h:int )
+		public function Map( files:Array, maps:Array, width:Number, height:Number, speed:Number = .25 )//, url:String, w:int, h:int )
 		{
 			super( );
-			this.map = map ;
-			this.speed = speed ;
-			this.zoom = 1 ;
+
 			MAP_WIDTH = width ;
 			MAP_HEIGHT = height ;			
 			this.scale = Math.min( 1, Map.MAP_WINDOW_WIDTH/MAP_WIDTH );
+			this.maps = maps ;
+			this.speed = speed ;
+			this.zoom = 1 ;
+			
+			//	Listen for state events
 			addEventListener( StateEvent.RUN, run ) ;
 			addEventListener( StateEvent.NEXT, next );
-			addEventListener( Event.ENTER_FRAME, frame );			
-
 
 			//	Keep track of the number of loaders
 			var loaders:int ;
@@ -77,14 +75,12 @@ package com.madsystems.components.map
 						var loader:JsonLoader = ( new JsonLoader());
 						loader.addEventListener( Event.COMPLETE, listener );
 						++loaders ;
-						file.paths = loader.load( file.url as String, file.reverse );
+						file.paths = loader.load( file.url as String );
 				 		array.push( file );
 				 	}
 				}
 		 		return array ; 
 			})( files, [] );			
-
-
 		}
 		
 		private function init( json:Array ):void {
@@ -111,26 +107,19 @@ package com.madsystems.components.map
 			})( json, [] ) ;
 			
 			//	Create the tween
-			tween.animate = new Tween( {}, "", None.easeNone, 0, 1, speed, true ) ;
-			( tween.animate as Tween ).addEventListener( TweenEvent.MOTION_CHANGE, animate );
-			( tween.animate as Tween ).addEventListener( TweenEvent.MOTION_FINISH, animate );
-			( tween.animate as Tween ).start( );
+			tween = new Tween( {}, "", None.easeNone, 0, 1, speed, true ) ;
 		}
 		override public function run( event:Event ):void {
-			
-			trace( parent );
-			trace( "run("+event+")" );
-			if ( !contains( map ))
-				addChildAt( map, 0 );
+			trace("run("+event+")");
+			if ( !hasEventListener( Event.ENTER_FRAME ))
+				addEventListener( Event.ENTER_FRAME, frame );			
 			if ( !contains( sprite ))
 				addChild( sprite );
-			//	Add the map and sprite to the display list
-			//	Note that the map should be separate from this
-			//	so that we can dim a path
-			//	Start the tween
-			//	if ( tween )
-				//	tween.start( );
-				//setZoom( scale );
+			if ( tween ) {
+				tween.addEventListener( TweenEvent.MOTION_CHANGE, animate );
+				tween.addEventListener( TweenEvent.MOTION_FINISH, animate );
+				tween.start( );
+			}
 		}
 		
 		override public function next( event:Event ):void {
@@ -142,44 +131,36 @@ package com.madsystems.components.map
 		private function animate( event:TweenEvent ):void 
 		{	
 			sprite.graphics.clear( );
-			
-			var t:Number = ( ( tween.animate as Tween ).time / ( tween.animate as Tween ).duration );
+			var t:Number = ( tween.time / tween.duration );
 			var object:Object ;
-			
-			//	Draw the paths that are already done
 			var j:int= 0 ;
 			while ( j < index ) 
 				draw( 1, paths[ j++ ] ); 
-			
-		
 			if ( event.type == TweenEvent.MOTION_FINISH ) {
-				( tween.animate as Tween ).stop( ); ( tween.animate as Tween ).rewind( ); 
+				tween.stop( ); tween.rewind( ); 
 				if ( !drawn( paths[ index ] ))
-					( tween.animate as Tween ).start( );
+					tween.start( );
+				else dispatchEvent( new Event( Event.COMPLETE ));
 			}
-			
-			
 			location =  draw( t, paths[ index ] );
 		}	
 		
 		private function frame( event:Event ):void {
-//			if ( Math.abs( scale - zoom ) > .005 )
-				//this.zoom += ( this.scale - this.zoom ) * .325 ;
-//			else zoom = scale ;
-			//trace( "animate("+zoom+")");			
-			//trace( "frame("+this.zoom+")");			
-			//trace( "foo("+this.foo+")");
-			//trace( "zoom("+this.zoom+")");			
-			trace( "scale("+( this.scale == 2 )+")");	
-			return ;		
-			//trace( "("+this+")");			
-
+			zoom += ( scale - zoom ) * .325 ;
 			if ( location ) {
 				var point:Point = location ;
 				
 				//	Scale the sprite and the map
 				sprite.scaleX = sprite.scaleY = zoom ;
-				map.scaleX = map.scaleY = zoom ;
+				
+				for each ( var map:DisplayObject in maps ) {
+					if ( map is Map ) {
+						( map as Map ).sprite.scaleX = zoom ;
+						( map as Map ).sprite.scaleY = zoom ;
+					} else {
+						map.scaleX = map.scaleY = zoom ;
+					}
+				}
 				
 				//	Calculate the map offset
 				var dx:Number = ( Map.MAP_WINDOW_WIDTH/2 - point.x ) * zoom ;
@@ -194,10 +175,16 @@ package com.madsystems.components.map
 				sprite.y = ( Math.min( Math.max( Math.floor( sprite.y ), Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT ), 0 )) ;
 
 				//	tiles.render( new Point( sprite.x, sprite.y ));
-				map.x = sprite.x ;
-				map.y = sprite.y ;
+				for each ( map in maps ) {
+					if ( map is Map ) {
+						( map as Map ).sprite.x = sprite.x ;
+						( map as Map ).sprite.y = sprite.y ;
+					} else {
+						map.x = sprite.x ;
+						map.y = sprite.y ;
+					}
+				}
 			}
-			
 		}
 		
 		private function drawn( object:* ):Boolean {
@@ -205,7 +192,7 @@ package com.madsystems.components.map
 			if ( object is Array ) {
 				for ( var i:int = 0; i < object.length; i++ ) {
 					var path:Path = ( object[ i ] as Path );
-					drawn = ( path.drawn() && drawn ) ;
+					drawn = ( path.drawn( ) && drawn ) ;
 				}
 			} else if ( object is Path ) {
 				drawn = ( object as Path ).drawn( );
@@ -217,31 +204,9 @@ package com.madsystems.components.map
 		
 		public function setZoom( scale:Number ):void {
 			this.scale = scale ;
-//			this.scale = scale ;
-//			trace("setZoom("+this.scale+")");
-//			trace("setZoom("+this.zoom+")");
-//			return ;
-//			this.foo = 2 ;//scale ;
-//			this.boo = 2 ;
-//			return ;
-//			//return ;
-//			//this.scale = scale ;
-//			if ( !tween.zoom ) {
-//				tween.zoom = new Tween( {}, "", None.easeNone, zoom, scale, .25, true ) ;
-//				( tween.zoom as Tween ).addEventListener( TweenEvent.MOTION_CHANGE, change );
-//				( tween.zoom as Tween ).addEventListener( TweenEvent.MOTION_FINISH, change );
-//			}
-//			( tween.zoom as Tween ).stop( );
-//			( tween.zoom as Tween ).rewind( );
-//			( tween.zoom as Tween ).begin = zoom ;
-//			( tween.zoom as Tween ).finish = scale ;
-//			( tween.zoom as Tween ).start( );
+			trace("setZoom("+scale+")");
 		}
 		
-		private function change( event:TweenEvent ):void {
-			zoom = ( event.target as Tween ).position ;
-			trace( zoom )
-		}
 		public function track( id:String, enabled:Boolean ):void {
 			trace("track("+id+","+enabled+")");
 			//return ;
@@ -268,16 +233,14 @@ package com.madsystems.components.map
 			if ( object is Array ) {
 				for ( var i:int = 0; i < object.length; i++ ) {
 					var path:Path = ( object[ i ] as Path );
-					if ( !path.enabled ) continue ;
 					var p:Point = ( path.draw( t ) as Point ).clone();
+					if ( !path.enabled ) 
+						continue ;
 					if ( point ) {
-						//if ( path.enabled ) {
-							point.x += ( p.x - point.x )/2 ;
-							point.y += ( p.y - point.y )/2 ; // = point.add( matrix.transformPoint( p.subtract( point )));
-						//}
+						point.x += ( p.x - point.x )/2 ;
+						point.y += ( p.y - point.y )/2 ; 
 					} else {
 						point = p ;	
-						//trace( "[ "+i+" ] " + point ) ;
 					}
 				}
 			} else if ( object is Path ) {

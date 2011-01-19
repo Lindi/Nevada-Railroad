@@ -1,18 +1,24 @@
 ﻿package com.madsystems.components
 {
+	import com.madsystems.components.caption.CaptionFactory;
 	import com.madsystems.components.image.BitmapFactory;
+	import com.madsystems.components.loop.LoopFactory;
 	import com.madsystems.components.map.MapFactory;
 	import com.madsystems.components.slideshow.SlideshowFactory;
 	import com.madsystems.components.transition.TransitionFactory;
-	import com.madsystems.components.caption.CaptionFactory ;
-	import com.madsystems.components.loop.LoopFactory;
 	
 	import flash.display.DisplayObjectContainer;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
 	
 	public class ComponentFactory
 	{
 	
 		protected static var main:DisplayObjectContainer ;
+		
+		//	Blech.  We'd properly encapsulate this if we weren't in a hurry
+		public var dispatcher:EventDispatcher = new EventDispatcher( );
 		
 		public function ComponentFactory(  ) {
 			var factory:Class = SlideshowFactory ;
@@ -26,6 +32,10 @@
 		
 		public function initiatlize( container:DisplayObjectContainer ):ComponentFactory {
 			main = container ;
+			for each ( var factory:ComponentFactory in factories ) {
+				if ( factory is IEventDispatcher )
+					( factory as IEventDispatcher ).addEventListener( Event.COMPLETE, complete );
+			}
 			return this ;
 		}
 		public static var factories:Object = new Object( );
@@ -35,6 +45,9 @@
 				factories[ id ] = factory ;
 		}
 		
+		private function complete( event:Event ):void {
+			dispatcher.dispatchEvent( event.clone());
+		}
 		public static function create( component:XML ):Object {
 			var type:String = ( component.name().localName as String ) ;
 			var factory:ComponentFactory = ( factories[ type ] as ComponentFactory ) ;

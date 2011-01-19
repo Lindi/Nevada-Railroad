@@ -27,35 +27,37 @@
 			addEventListener( StateEvent.NEXT, next ) ;
 			timer = new Timer( 100 );
 		}
-		
 		public function add( bitmap:Bitmap, name:String ):void 
 		{
 			this[ name ] = bitmap ;
 		}
-	
-	
 		override public function run( event:Event ):void {
-			if ( bitmap && background ) {
-				if ( bitmap.bitmapData && background.bitmapData ) {
-					init( );
-				} else {
-					if ( !timer.hasEventListener( TimerEvent.TIMER )) {
-						timer.addEventListener(TimerEvent.TIMER,
-							function( event:TimerEvent ):void {
-								if ( bitmap.bitmapData && background.bitmapData ) {
-									timer.removeEventListener( event.type, arguments.callee );
-									timer.stop( );
-									init( );
-								}
-							});
-						timer.start( );
-					}
+			if ( stage ) {
+				init( );
+			} else {
+				if ( !timer.hasEventListener( TimerEvent.TIMER )) {
+					timer.addEventListener(TimerEvent.TIMER,
+						function( event:TimerEvent ):void {
+							if ( stage ) {
+								timer.removeEventListener( event.type, arguments.callee );
+								timer.stop( );
+								init( );
+							}
+						});
+					timer.start( );
 				}
-			}			
+			}
 		}
 		override public function next( event:Event ):void {
+			
+			//	Kill the timer
 			if ( timer )
 				timer.stop() ;
+				
+			//	Remove the frame event listener if there is one
+			if ( hasEventListener( Event.ENTER_FRAME ))
+				removeEventListener( Event.ENTER_FRAME, frame );
+				
 			if ( cars.length ) {
 				for each ( var car:Object in cars ) {
 					( car as DisplayObject ).visible = false ;
@@ -105,7 +107,7 @@
 			}
 			if ( car.y < -car.height ) {
 				removeEventListener( Event.ENTER_FRAME, frame );
-				index = stage.stageHeight ;
+				index = 1080 ;///stage.stageHeight ;
 				timer.start( );
 			}
 		}

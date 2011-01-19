@@ -43,12 +43,14 @@
 
 				
 			//	Create the map
-			var image:XML = ( component.image as XMLList )[0] ; 
-			var bitmap:Bitmap = ComponentFactory.create( image ) as Bitmap;
+			var maps:Array = new Array( );
+			for each ( var graphic:XML in component.background.* ) {
+				maps.push( ComponentFactory.create( graphic ));
+			}
 			var width:Number = Number( component.@width.toString( ));
 			var height:Number = Number( component.@height.toString( ));
 			var speed:Number = Number( component.@speed.toString( ));
-			components[ component.@id ] = map = new Map( routes, bitmap, width, height, speed );
+			components[ component.@id ] = map = new Map( routes, maps, width, height, speed );
 			return map ;
 		}
 	}
