@@ -2,6 +2,8 @@
 {
 	import com.madsystems.components.caption.CaptionFactory;
 	import com.madsystems.components.image.BitmapFactory;
+	import com.madsystems.components.button.ButtonFactory;
+	import com.madsystems.components.gallery.GalleryFactory;
 	import com.madsystems.components.loop.LoopFactory;
 	import com.madsystems.components.map.MapFactory;
 	import com.madsystems.components.slideshow.SlideshowFactory;
@@ -27,6 +29,8 @@
 			factory = TransitionFactory ;
 			factory = CaptionFactory ;
 			factory = LoopFactory ;
+			factory = ButtonFactory ;
+			factory = GalleryFactory ;
 			//	Add additional components ...
 		}	
 		

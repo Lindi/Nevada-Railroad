@@ -60,8 +60,7 @@
 				for ( var i:int = 0; i < node.children().length(); i++ ) { //each ( var child:XML in node.children()) {
 					var child:XML = node.children()[ i] as XML;
 					var component:XML = ( application.* ).child(child.@type.toString()).(@id == child.@id)[0];
-					var display:Object =  ComponentFactory.create( component ) ;
-					( components[ node.@id ] as Array ).push( { id: child.@id.toString( ), component: display });
+					( components[ node.@id ] as Array ).push( { id: child.@id.toString( ), component: ComponentFactory.create( component ) });
 				}
 			}
 			
@@ -88,6 +87,9 @@
 					var array:Array = ( stateMachine.states[ state.@id ] as State ).components ;
 					array.push( a[i].component ) ;
 					array[ a[i].id ] = a[i].component ;
+					if ( a[i].component is DisplayObjectContainer )
+						trace( "numChildren " + ( a[i].component as DisplayObjectContainer ).numChildren );
+						
 				}	
 					
 				

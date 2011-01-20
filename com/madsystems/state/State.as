@@ -39,6 +39,11 @@
 		public function run( ):void {
 			trace("run("+id+")");
 			
+			//	N.B.:	We're doing this before so that
+			//	child components don't flame out if they
+			//	reference the stage during the run event
+			main.addChild( uicomponent );
+
 			//	N.B.:  You must iterate over the array to ensure that
 			//	components are added to the uicomponent in the correct order
 			for ( var i:int = 0; i < components.length; i++ ) {
@@ -48,7 +53,6 @@
 				if ( component is IEventDispatcher )
 					( component as IEventDispatcher ).dispatchEvent( new StateEvent( StateEvent.RUN ));
 			}
-			main.addChild( uicomponent );
 			
 			//	Create the timeout timer
 			if ( timer )
@@ -125,7 +129,8 @@
 		private function show( displayObject:DisplayObject, container:DisplayObjectContainer, index:int ):void {
 			trace("show("+displayObject+","+index+")");
 			//displayObject.visible = !( displayObject is Bitmap );
-				
+			if ( displayObject is DisplayObjectContainer )
+				trace( ( displayObject as DisplayObjectContainer ).numChildren );
 			//if ( !container.contains( displayObject )) {
 				if ( displayObject.parent is DisplayObjectContainer ) 
 					container.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), index )

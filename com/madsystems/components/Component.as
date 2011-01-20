@@ -1,7 +1,7 @@
 package com.madsystems.components
 {
 	import flash.events.Event 
-	import flash.display.Sprite;;	
+	import flash.display.Sprite;
 
 	public class Component extends Sprite
 	{	
