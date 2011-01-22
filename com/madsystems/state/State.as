@@ -9,8 +9,9 @@
 	import flash.events.IEventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
+	import flash.display.Sprite ;
 	
-	import mx.core.UIComponent;;
+	//import mx.core.UIComponent;;
 	
 	public class State extends EventDispatcher implements IState
 	{
@@ -19,7 +20,7 @@
 		public var components:Array ;
 		public var inputs:Object ;
 		public var id:String ;
-		public var uicomponent:UIComponent ;
+		public var uicomponent:Sprite ; //UIComponent ;
 		public var main:DisplayObjectContainer ;
 		internal var timer:Timer ;
 		
@@ -27,7 +28,7 @@
 		{
 			super( );
 			this.main = main ;
-			uicomponent = new UIComponent( );
+			uicomponent = new Sprite( ); //new UIComponent( );
 			components = new Array( );
 			inputs = new Object( );
 			if ( timeout ) {

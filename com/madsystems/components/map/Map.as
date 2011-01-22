@@ -71,7 +71,6 @@ package com.madsystems.components.map
 			//	We're creating an "anonymous" loader
 			json = ( function ( files:Array, array:Array ):Array {
 				for each ( var file:* in files ) {
-					 
 				 	if ( file is Array ) {
 				 		array.push( arguments.callee( file, [] ));
 				 	} else {
@@ -141,15 +140,19 @@ package com.madsystems.components.map
 				tween.stop( ); tween.rewind( ); 
 				if ( !drawn( paths[ index ] ))
 					tween.start( );
-				else dispatchEvent( new Event( Event.COMPLETE ));
+				else {
+					dispatchEvent( new Event( Event.COMPLETE ));
+					return ;	
+				}
 			}
 			location =  draw( t, paths[ index ] );
 		}	
 		
 		private function frame( event:Event ):void {
-			zoom += ( scale - zoom ) * .325 ;
+			zoom += ( scale - zoom ) * .125 ;
 			if ( location ) {
-				var point:Point = location ;
+				var point:Point = location.clone() ;
+				point.x *= zoom ; point.y *= zoom ;
 				
 				//	Scale the sprite and the map
 				sprite.scaleX = sprite.scaleY = zoom ;
@@ -164,16 +167,17 @@ package com.madsystems.components.map
 				}
 				
 				//	Calculate the map offset
-				var dx:Number = ( Map.MAP_WINDOW_WIDTH/2 - point.x ) * zoom ;
-				var dy:Number = ( Map.MAP_WINDOW_HEIGHT/2 - point.y ) * zoom ;
+				var dx:Number = ( Map.MAP_WINDOW_WIDTH/2 - point.x ) //* zoom ;
+				var dy:Number = ( Map.MAP_WINDOW_HEIGHT/2 - point.y ) //* zoom ;
 
 				//	Tween the map position 
 				sprite.x += ( dx - sprite.x ) * .125 ;
 				sprite.y += ( dy - sprite.y ) * .125 ;
 				
 				//	Keep the map from scrolling off the screen 
-				sprite.x = ( Math.min( Math.max( Math.floor( sprite.x ), Map.MAP_WINDOW_WIDTH - MAP_WIDTH ), 0 )) ;
-				sprite.y = ( Math.min( Math.max( Math.floor( sprite.y ), Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT ), 0 )) ;
+				sprite.x = ( Math.min( Math.max( Math.floor( sprite.x ), Map.MAP_WINDOW_WIDTH - ( MAP_WIDTH * zoom )), 0 )) ;
+				sprite.y = ( Math.min( Math.max( Math.floor( sprite.y ), Map.MAP_WINDOW_HEIGHT - ( MAP_HEIGHT * zoom )), 0 )) ;
+
 
 				//	tiles.render( new Point( sprite.x, sprite.y ));
 				for each ( map in maps ) {

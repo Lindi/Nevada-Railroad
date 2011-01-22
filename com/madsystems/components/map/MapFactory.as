@@ -9,6 +9,8 @@
 	{
 		private var builder:Builder ;
 		
+		public function MapFactory( ) {}
+		
 		override protected function create( component:XML ):Object {
 			
 			if ( !builder )
@@ -20,7 +22,7 @@
 				return object ;
 			return builder.build( component ) ;
 		}
-		ComponentFactory.factories["map"] = new MapFactory(  ) ;
+		//ComponentFactory.factories["map"] = new MapFactory(  ) ;
 	}
 }
 

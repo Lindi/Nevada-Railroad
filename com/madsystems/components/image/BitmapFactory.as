@@ -11,6 +11,9 @@
 	{
 		private var builder:Builder ;
 	
+	
+		public function BitmapFactory( ) {}
+		
 		override protected function create( component:XML ):Object {
 			if ( !builder ) {
 				builder = new BitmapBuilder( );
@@ -24,7 +27,7 @@
 			( builder as IEventDispatcher ).removeEventListener( Event.COMPLETE, complete );
 		}
 
-		ComponentFactory.add("image", new BitmapFactory( ));
+		//ComponentFactory.add("image", new BitmapFactory( ));
 
 		public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
 		{

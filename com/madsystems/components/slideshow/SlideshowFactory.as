@@ -18,7 +18,7 @@ package com.madsystems.components.slideshow
 			return builder.build( component ) ;
 		}
 
-		ComponentFactory.add("slideshow", new SlideshowFactory( ));
+		//ComponentFactory.add("slideshow", new SlideshowFactory( ));
 	}
 }
 

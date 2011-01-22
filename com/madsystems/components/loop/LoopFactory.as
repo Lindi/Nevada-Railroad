@@ -17,7 +17,7 @@ package com.madsystems.components.loop
 			return builder.build( component ) ;
 		}
 
-		ComponentFactory.add("loop", new LoopFactory( ));
+		//ComponentFactory.add("loop", new LoopFactory( ));
 	}
 }
 

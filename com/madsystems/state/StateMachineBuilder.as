@@ -8,6 +8,7 @@
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.utils.getDefinitionByName;
+	//import flash.filesystem.* ;
 	
 	public class StateMachineBuilder extends EventDispatcher
 	{
@@ -26,17 +27,11 @@
 					//	Kill the listener
 					loader.removeEventListener( Event.COMPLETE, arguments.callee );
 					
-//					//	Create a factory to load the factory classes
-					var factory:ComponentFactory = ( new ComponentFactory(  )  ).initiatlize( main );
-
-					//	Listen for when it's complete
-					factory.dispatcher.addEventListener( Event.COMPLETE, complete );
 					
 					//	Grab the XML and build the states
 					build( new XML( loader.data ), main );
 										
-					//	We're done now
-					//dispatchEvent( new Event( Event.COMPLETE ));
+
 				};
 				
 			//	Load the state xml configuration
@@ -52,14 +47,24 @@
 
 		private function build( application:XML, main:DisplayObjectContainer ):void { //state:State, inputs:XMLList, components:XMLList, root:XML ):StateMachineBuilder {
 			
-			
+//					//	Create a factory to load the factory classes
+			var factory:ComponentFactory = (ComponentFactory.getInstance()).initiatlize( main );
+
+			//	Listen for when it's complete
+			factory.dispatcher.addEventListener( Event.COMPLETE, complete );
+		
 			//	Build the components
 			var components:Object = new Object( );
 			for each ( var node:XML in application.components.* ) {
 				components[ node.@id ] = new Array( );
 				for ( var i:int = 0; i < node.children().length(); i++ ) { //each ( var child:XML in node.children()) {
 					var child:XML = node.children()[ i] as XML;
-					var component:XML = ( application.* ).child(child.@type.toString()).(@id == child.@id)[0];
+					//log( child.toXMLString());
+					var list:XMLList =  (( application.* ).child(child.@type.toString()) as XMLList ) ;//.(@id == child.@id.toString());
+					for each ( var component:XML in list )
+						if ( component.@id == child.@id )
+							break ;
+					//var component:XML = ( application.* ).child(child.@type.toString()).(@id == child.@id)[0];
 					( components[ node.@id ] as Array ).push( { id: child.@id.toString( ), component: ComponentFactory.create( component ) });
 				}
 			}
@@ -87,8 +92,8 @@
 					var array:Array = ( stateMachine.states[ state.@id ] as State ).components ;
 					array.push( a[i].component ) ;
 					array[ a[i].id ] = a[i].component ;
-					if ( a[i].component is DisplayObjectContainer )
-						trace( "numChildren " + ( a[i].component as DisplayObjectContainer ).numChildren );
+//					if ( a[i].component is DisplayObjectContainer )
+//						trace( "numChildren " + ( a[i].component as DisplayObjectContainer ).numChildren );
 						
 				}	
 					
@@ -125,5 +130,18 @@
 		private function complete( event:Event ):void {
 			dispatchEvent( event.clone());
 		}
+//		public function log( message:* ):void {
+//			var myFile:File = File.desktopDirectory.resolvePath("nevada-log.txt");
+//		    var fileStream:FileStream = new FileStream();
+//		    fileStream.open(myFile, FileMode.READ);
+//		    var text:String = fileStream.readUTFBytes(fileStream.bytesAvailable);
+//		    fileStream.close();
+//
+//			text = text + "\n" + String( message );
+//		    fileStream.open(myFile, FileMode.WRITE);
+//		    
+//		    fileStream.writeUTFBytes( text );
+//		    fileStream.close();
+//		}
 	}
 }

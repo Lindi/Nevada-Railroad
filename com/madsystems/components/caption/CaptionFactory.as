@@ -8,17 +8,20 @@
 	{
 		private var builder:Builder ;
 	
+		public function CaptionFactory( ) {}
+
 		override protected function create( component:XML ):Object {
 			if ( !builder )
 				builder = new CaptionBuilder( );
 			var id:String = component.@id.toString();
 			var color:Number = Number( component.@color.toString( ));
-			var object:Object = builder.create( { id: id, color: color } );
+			var blend:Number = Number( component.@blend.toString( ));
+			var object:Object = builder.create( { id: id, color: color, blend: blend } );
 			if ( object )
 				return object ;
 			return builder.build( component ) ;
 		}
-		ComponentFactory.add("caption", new CaptionFactory( ));
+		//ComponentFactory.add("caption", new CaptionFactory( ));
 	}
 }
 
@@ -38,7 +41,8 @@ class CaptionBuilder extends Builder
 		if ( components[ id ] is Caption ) 
 			return components[ id ] ;
 			
-		var color:int = int( object.color );
+		var color:Number = Number( object.color );
+		var blend:Number = Number( object.blend );
 
 		//	Create a bitmap reference to be returned synchrononously
 		caption = new Caption( color );

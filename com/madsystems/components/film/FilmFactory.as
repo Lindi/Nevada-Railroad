@@ -18,7 +18,7 @@ package com.madsystems.components.film
 			return builder.build( component ) ;
 		}
 
-		ComponentFactory.add("film", new FilmFactory( ));
+		//ComponentFactory.add("film", new FilmFactory( ));
 	}
 }
 

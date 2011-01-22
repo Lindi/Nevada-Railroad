@@ -76,6 +76,7 @@
 				bitmap.alpha = .9 ;
 				bitmap.x = ( stage.stageWidth - bitmap.width )/2 ;
 				bitmap.visible = false ;
+				bitmap.y = stage.stageHeight ;
 				while ( cars.length < 3 ) {
 					cars.push( addChild( new Bitmap( bitmap.bitmapData.clone())));
 					var car:Bitmap = cars[ cars.length - 1] as Bitmap ;
@@ -83,6 +84,7 @@
 					car.alpha = .9 ;
 					car.x = ( stage.stageWidth - bitmap.width )/2 ;
 					car.visible = false ;
+					car.y = stage.stageHeight ;
 				}
 				index = stage.stageHeight ;
 			}
@@ -107,7 +109,7 @@
 			}
 			if ( car.y < -car.height ) {
 				removeEventListener( Event.ENTER_FRAME, frame );
-				index = 1080 ;///stage.stageHeight ;
+				index = 1080 ;
 				timer.start( );
 			}
 		}
