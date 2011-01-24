@@ -13,7 +13,7 @@
 	
 	
 		public function BitmapFactory( ) {}
-		
+			
 		override protected function create( component:XML ):Object {
 			if ( !builder ) {
 				builder = new BitmapBuilder( );
