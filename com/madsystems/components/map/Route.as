@@ -23,9 +23,9 @@
 		private var pen:Pen ;
 		private var sprite:Sprite ;
 	
-		public function Route( url:String, main:DisplayObjectContainer = null )
+		public function Route( url:String, Nevada:DisplayObjectContainer = null )
 		{
-			super( main );
+			super( Nevada );
 			
 			this.url = url;
 			

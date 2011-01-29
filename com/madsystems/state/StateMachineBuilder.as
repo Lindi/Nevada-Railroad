@@ -14,9 +14,9 @@
 	{
 		public var stateMachine:StateMachine ;
 					
-		public function StateMachineBuilder( main:DisplayObjectContainer ) {
+		public function StateMachineBuilder( Nevada:DisplayObjectContainer ) {
 			
-			stateMachine = new StateMachine( main );
+			stateMachine = new StateMachine( Nevada );
 			
 			
 			//	Use an anonymous function reference
@@ -29,7 +29,7 @@
 					
 					
 					//	Grab the XML and build the states
-					build( new XML( loader.data ), main );
+					build( new XML( loader.data ), Nevada );
 										
 
 				};
@@ -45,10 +45,10 @@
 			}
 		}
 
-		private function build( application:XML, main:DisplayObjectContainer ):void { //state:State, inputs:XMLList, components:XMLList, root:XML ):StateMachineBuilder {
+		private function build( application:XML, Nevada:DisplayObjectContainer ):void { //state:State, inputs:XMLList, components:XMLList, root:XML ):StateMachineBuilder {
 			
 //					//	Create a factory to load the factory classes
-			var factory:ComponentFactory = (ComponentFactory.getInstance()).initiatlize( main );
+			var factory:ComponentFactory = (ComponentFactory.getInstance()).initiatlize( Nevada );
 
 			//	Listen for when it's complete
 			factory.dispatcher.addEventListener( Event.COMPLETE, complete );
@@ -74,8 +74,8 @@
 				
 				//	Create the new state
 				if ( state.@timeout ) 
-					stateMachine.states[ state.@id ] = new State( main, Number( state.@timeout.toString()));
-				else stateMachine.states[ state.@id ] = new State( main );
+					stateMachine.states[ state.@id ] = new State( Nevada, Number( state.@timeout.toString()));
+				else stateMachine.states[ state.@id ] = new State( Nevada );
 
 				//	Set its id
 				( stateMachine.states[ state.@id ] as State ).id = state.@id.toString();

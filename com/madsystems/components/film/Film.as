@@ -13,13 +13,13 @@
 	{
 		private var video:Video ;
 		private var videoStream:NetStream ;
-		private var main:DisplayObjectContainer ;
+		private var Nevada:DisplayObjectContainer ;
 		public  var url:String ;
 		
-		public function Film( main:DisplayObjectContainer )
+		public function Film( Nevada:DisplayObjectContainer )
 		{
 			super();
-			this.main = main ;
+			this.Nevada = Nevada ;
 			var videoConnection:NetConnection = new NetConnection( );
 			videoConnection.connect(null);
 			videoStream = new NetStream(videoConnection);
@@ -51,17 +51,17 @@
 			if ( !displayObject )
 				return ;
 			trace("film.show("+displayObject+")");
-			if ( !main.contains( displayObject )) {
+			if ( !Nevada.contains( displayObject )) {
 				if ( displayObject.parent is DisplayObjectContainer ) 
-					main.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), main.numChildren)
-				else main.addChildAt( displayObject, main.numChildren );
+					Nevada.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), Nevada.numChildren)
+				else Nevada.addChildAt( displayObject, Nevada.numChildren );
 			}
 		}
 		private function hide( displayObject:DisplayObject ):void {
 			if ( !displayObject )
 				return ;
-			if ( main.contains( displayObject )) {
-				main.removeChild( displayObject ) ;
+			if ( Nevada.contains( displayObject )) {
+				Nevada.removeChild( displayObject ) ;
 			}			
 		}		
         public function onMetaData(info:Object):void { 

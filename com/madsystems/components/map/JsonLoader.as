@@ -8,7 +8,7 @@ package com.madsystems.components.map
 	import flash.net.URLRequest ;
 	import com.adobe.serialization.json.JSON;
 
-	internal class JsonLoader extends EventDispatcher {
+	public class JsonLoader extends EventDispatcher {
 	
 	private var paths:Array ;
 

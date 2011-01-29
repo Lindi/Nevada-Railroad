@@ -16,7 +16,7 @@
 	public class ComponentFactory
 	{
 	
-		protected static var main:DisplayObjectContainer ;
+		protected static var Nevada:DisplayObjectContainer ;
 		public static var factories:Object 
 		
 		//	Blech.  We'd properly encapsulate this if we weren't in a hurry
@@ -49,7 +49,7 @@
 		}
 
 		public function initiatlize( container:DisplayObjectContainer ):ComponentFactory {
-			main = container ;
+			Nevada = container ;
 			for each ( var factory:ComponentFactory in factories ) {
 				if ( factory is IEventDispatcher )
 					( factory as IEventDispatcher ).addEventListener( Event.COMPLETE, complete );

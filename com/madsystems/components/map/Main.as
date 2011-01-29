@@ -114,7 +114,7 @@
 				
 				//	Create a loader to load the bitmap
 				var loader:Loader = new Loader( );
-				var main:Main = this ;
+				var Nevada:Main = this ;
 				loader.contentLoaderInfo.addEventListener( Event.COMPLETE, 
 					function ( event:Event ):void {
 						//	trace( "build("+event+")");
@@ -123,7 +123,7 @@
 						var loaderInfo:LoaderInfo = ( event.target as LoaderInfo ) ; 
 						var bitmap:Bitmap = ( loaderInfo.content as Bitmap ) ;
 						map = new Map( files, [bitmap], bitmap.width, bitmap.height ) ;//, url, 2335.71, 2808 );
-						main.addChild( map ) ;
+						Nevada.addChild( map ) ;
 						
 						//	Remove the listener
 						( event.target as LoaderInfo ).removeEventListener

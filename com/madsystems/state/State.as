@@ -11,7 +11,7 @@
 	import flash.utils.Timer;
 	import flash.display.Sprite ;
 	
-	//import mx.core.UIComponent;;
+	import mx.core.UIComponent;;
 	
 	public class State extends EventDispatcher implements IState
 	{
@@ -20,15 +20,15 @@
 		public var components:Array ;
 		public var inputs:Object ;
 		public var id:String ;
-		public var uicomponent:Sprite ; //UIComponent ;
-		public var main:DisplayObjectContainer ;
+		public var uicomponent:UIComponent ;
+		public var Nevada:DisplayObjectContainer ;
 		internal var timer:Timer ;
 		
-		public function State( main:DisplayObjectContainer, timeout:Number = 0 )
+		public function State( Nevada:DisplayObjectContainer, timeout:Number = 0 )
 		{
 			super( );
-			this.main = main ;
-			uicomponent = new Sprite( ); //new UIComponent( );
+			this.Nevada = Nevada ;
+			uicomponent = new UIComponent( );
 			components = new Array( );
 			inputs = new Object( );
 			if ( timeout ) {
@@ -43,7 +43,7 @@
 			//	N.B.:	We're doing this before so that
 			//	child components don't flame out if they
 			//	reference the stage during the run event
-			main.addChild( uicomponent );
+			Nevada.addChild( uicomponent );
 
 			//	N.B.:  You must iterate over the array to ensure that
 			//	components are added to the uicomponent in the correct order
@@ -94,7 +94,7 @@
 					next = input[i].next ;
 				} 
 				if ( next ) {
-					main.removeChild( uicomponent );
+					Nevada.removeChild( uicomponent );
 					
 					//	Take the kids out
 					for each ( var child:DisplayObject in uicomponent )

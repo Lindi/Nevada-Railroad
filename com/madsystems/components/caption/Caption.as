@@ -1,7 +1,7 @@
 package com.madsystems.components.caption
 {
 	import com.madsystems.state.event.StateEvent;
-	
+	import com.madsystems.components.Component;	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
@@ -11,7 +11,6 @@ package com.madsystems.components.caption
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
-	import com.madsystems.components.Component;
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
 	
@@ -28,8 +27,8 @@ package com.madsystems.components.caption
 		{  
 			super();
 			var format:TextFormat = new TextFormat( );
-			var myFont:Font = new Satero( );
-			format.font = myFont.fontName ; //"Satero Serif LT Pro" ; 
+			//var myFont:Font = new Satero( );
+			format.font = "Satero Serif LT Pro" ; //myFont.fontName ; //"Satero Serif LT Pro" ; 
 			format.bold = true ;
 			format.size = 32 ;
 			format.color = color ;
@@ -79,8 +78,6 @@ package com.madsystems.components.caption
 			sprite.graphics.endFill();
 			if ( !caption.length ) {
 				timer.stop();
-				//	removeEventListener( Event.ENTER_FRAME, frame );
-				
 				//	Dispatch the complete event a second
 				//	after the caption has completed
 				var t:Timer = new Timer( 1000, 1 );

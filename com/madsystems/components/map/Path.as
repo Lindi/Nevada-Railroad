@@ -9,9 +9,17 @@
 	{
 		private var sprite:Sprite ;
 		private var paths:Array ;
-		private var s:Number ;
+		//private var s:Number ;
 		private var index:int  ;
+		
+		//	The length that was drawn on the last curve
 		private var length:Number ;
+		
+		//	The arc length
+		private var s:Number ; //1000 ;
+		
+		
+		
 		public var location:Point ;
 		private var thickness:int ;
 		private var color:Number ;
@@ -23,15 +31,25 @@
 		{
 			this.paths = paths ;
 			if ( properties.reverse )
-				paths.reverse();
+				reverse( paths );
 			this.id = properties.id ;
 			this.sprite = sprite ;
 			this.location = new Point( );
-			this.s = s ;
+			this.length = this.s = 5 ;
 			this.thickness = ( properties.hasOwnProperty( "thickness" ) ? int( properties.thickness ) : 1 ) ;
 			this.color = ( properties.hasOwnProperty( "color" ) ? Number( properties.color ) : 0xffffff ) ;
 		}
 		
+		
+		private function reverse( paths:Array ):void {
+			paths.reverse() ;
+			for each ( var path:Object in paths ) {
+				if ( path.hasOwnProperty("line"))
+					( path.line as Array ).reverse( );
+				else if ( path.hasOwnProperty("curve"))
+					( path.curve as Array ).reverse( );
+			}
+		}
 		public function drawn( ):Boolean {			
 			if ( index >= paths.length )
 				return true ;
@@ -39,19 +57,37 @@
 			return false ;
 		}
 		
-		public function draw( p:Number ):Point {
+		public function marked( ):Boolean {
+			return ( index >= paths.length );
+		}
+		
+		public function arc(  ):Point  
+		{	
+			//	Draw what's been drawn already
 			var j:int= 0 ;
 			while ( j < index )
 				mark( paths[ j++ ], 1 );
-			var point:Point = mark( paths[ index ], p );
-			if ( location ) {
-				rectangle.width = Math.abs( point.x - rectangle.x );
-				rectangle.height = Math.abs( point.y - rectangle.y );
-			} else {
-				rectangle.x = point.x ;
-				rectangle.y = point.y ;
-			}
-			location = point ;
+			do {
+				var ds:Number = Math.min( length, paths[ j ].length );
+				var t:Number = ds / paths[ j ].length ;
+				location = mark( paths[ j ], t ) ;
+				if ( ds == paths[ j ].length ) {
+					length -= paths[ j++ ].length ;
+				}
+			} while ( j < paths.length && length > paths[ j ].length )
+			length += s ;
+			index = j ;
+			return location ;
+			
+		}
+		
+		
+		public function draw( p:Number ):Point {
+			
+			var j:int= 0 ;
+			while ( j < index )
+				mark( paths[ j++ ], 1 );
+			location = mark( paths[ index ], p );
 			return location ;
 		
 		}
@@ -71,9 +107,9 @@
 			{
 				if ( !g ) g = sprite.graphics ;
 				if ( path.hasOwnProperty("line"))
-					return drawLine( path.line, t, g );
+					return drawLine( path.line, g, t );
 				else if ( path.hasOwnProperty("curve"))
-					return drawBezier( path.curve, t, g );
+					return drawBezier( path.curve, g, t );
 			}
 			return location ;
 		}
@@ -101,7 +137,7 @@
 		 * 
 		 * @returns The current position of the pen on the curve
 		 **/ 
-		private function drawBezier( curve:Array, t:Number, graphics:Graphics ):Point
+		private function drawBezier( curve:Array, graphics:Graphics, t:Number ):Point
 		{
 			if ( !graphics || !curve )
 				return null ;
@@ -113,11 +149,14 @@
 			var b:Object = curve[ 1] as Object ;
 			var c:Object = curve[ 2] as Object ;
 			var p:Point = new Point( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t );
-			var q:Point = new Point( b.x + ( c.x - b.x ) * t, b.y + ( c.y - b.y ) * t );
+			var q:Point = new Point( p.x + ( c.x - p.x ) * t, p.y + ( c.y - p.y ) * t );
 			graphics.lineStyle( thickness, color, 1 );
 			graphics.moveTo( a.x, a.y );
 			graphics.curveTo( p.x, p.y, q.x, q.y );
-			return q ;
+			var r:Point = new Point( );
+			r.x = (( 1 - t ) * ( 1 - t ) * a.x ) + ( 2 * ( 1 - t ) * t * b.x ) + ( t * t * c.x );
+			r.y = (( 1 - t ) * ( 1 - t ) * a.y ) + ( 2 * ( 1 - t ) * t * b.y ) + ( t * t * c.y );
+			return r ;
 		}
 		
 		/**
@@ -129,7 +168,7 @@
 		 * 
 		 * @returns The current position of the pen on the curve
 		 **/ 
-		private function drawLine( line:Array, t:Number, graphics:Graphics, alpha:Number = 1 ):Point
+		private function drawLine( line:Array, graphics:Graphics, t:Number ):Point
 		{
 			if ( isNaN( t ))
 				t = 1 ;
