@@ -92,9 +92,6 @@
 					var array:Array = ( stateMachine.states[ state.@id ] as State ).components ;
 					array.push( a[i].component ) ;
 					array[ a[i].id ] = a[i].component ;
-//					if ( a[i].component is DisplayObjectContainer )
-//						trace( "numChildren " + ( a[i].component as DisplayObjectContainer ).numChildren );
-						
 				}	
 					
 				

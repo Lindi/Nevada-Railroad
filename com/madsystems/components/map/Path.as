@@ -31,11 +31,11 @@
 		{
 			this.paths = paths ;
 			if ( properties.reverse )
-				reverse( paths );
+				paths.reverse( );
 			this.id = properties.id ;
 			this.sprite = sprite ;
 			this.location = new Point( );
-			this.length = this.s = 5 ;
+			this.length = this.s = ( properties.arclength? properties.arclength : 5 ) ;
 			this.thickness = ( properties.hasOwnProperty( "thickness" ) ? int( properties.thickness ) : 1 ) ;
 			this.color = ( properties.hasOwnProperty( "color" ) ? Number( properties.color ) : 0xffffff ) ;
 		}
@@ -44,12 +44,14 @@
 		private function reverse( paths:Array ):void {
 			paths.reverse() ;
 			for each ( var path:Object in paths ) {
-				if ( path.hasOwnProperty("line"))
+				if ( path.hasOwnProperty("curve"))
 					( path.line as Array ).reverse( );
-				else if ( path.hasOwnProperty("curve"))
+				else if ( path.hasOwnProperty("line"))
 					( path.curve as Array ).reverse( );
 			}
 		}
+
+
 		public function drawn( ):Boolean {			
 			if ( index >= paths.length )
 				return true ;

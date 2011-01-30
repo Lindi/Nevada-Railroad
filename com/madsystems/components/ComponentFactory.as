@@ -1,11 +1,12 @@
 ﻿package com.madsystems.components
 {
-	import com.madsystems.components.image.BitmapFactory ;
-	import com.madsystems.components.map.MapFactory ;
-	import com.madsystems.components.caption.CaptionFactory ;
-	import com.madsystems.components.loop.LoopFactory ;
-	import com.madsystems.components.button.ButtonFactory ;
-	import com.madsystems.components.gallery.GalleryFactory ;
+	import com.madsystems.components.button.ButtonFactory;
+	import com.madsystems.components.caption.CaptionFactory;
+	import com.madsystems.components.gallery.GalleryFactory;
+	import com.madsystems.components.image.BitmapFactory;
+	import com.madsystems.components.loop.LoopFactory;
+	import com.madsystems.components.map.MapFactory;
+	import com.madsystems.components.sound.SoundFactory;
 	
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -17,23 +18,13 @@
 	{
 	
 		protected static var Nevada:DisplayObjectContainer ;
-		public static var factories:Object 
+		public static var factories:Object ;
+		private var dispatchers:Array = new Array( ) ;
 		
 		//	Blech.  We'd properly encapsulate this if we weren't in a hurry
 		public var dispatcher:EventDispatcher = new EventDispatcher( );
+		public function ComponentFactory(  ) { }		
 		
-		public function ComponentFactory(  ) {
-			
-			
-			
-//			var factory:Class = BitmapFactory ;
-//			factory = MapFactory ;
-//			factory = CaptionFactory ;
-//			factory = LoopFactory ;
-//			factory = ButtonFactory ;
-//			factory = GalleryFactory ;
-			//	Add additional components ...
-		}	
 		public static function getInstance( ):ComponentFactory {
 			factories = new Object( ) ;
 			factories[ "image" ] = new BitmapFactory( );
@@ -42,6 +33,7 @@
 			factories[ "loop" ] = new LoopFactory( );
 			factories[ "button" ] = new ButtonFactory( );
 			factories[ "gallery" ] = new GalleryFactory( );
+			factories[ "sound" ] = new SoundFactory( );
 			
 			//	We can do this because we only call this function from one
 			//	place in the application
@@ -50,9 +42,12 @@
 
 		public function initiatlize( container:DisplayObjectContainer ):ComponentFactory {
 			Nevada = container ;
-			for each ( var factory:ComponentFactory in factories ) {
-				if ( factory is IEventDispatcher )
+			for ( var id:String in factories ) {
+				var factory:Object = factories[ id ] ;
+				if ( factory is IEventDispatcher ) {
 					( factory as IEventDispatcher ).addEventListener( Event.COMPLETE, complete );
+					dispatchers.push( id );
+				}
 			}
 			return this ;
 		}
@@ -65,6 +60,13 @@
 		}
 		
 		private function complete( event:Event ):void {
+			for ( var id:String in factories ) {
+				var factory:Object = factories[ id ] ;
+				if ( event.target == factory )
+					break ;
+			}
+			dispatchers.splice( dispatchers.indexOf( id ), 1 );
+			if ( !dispatchers.length )
 			dispatcher.dispatchEvent( event.clone());
 		}
 		public static function create( component:XML ):Object {

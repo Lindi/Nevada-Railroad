@@ -21,13 +21,13 @@
 		public var inputs:Object ;
 		public var id:String ;
 		public var uicomponent:UIComponent ;
-		public var Nevada:DisplayObjectContainer ;
+		public var nevada:DisplayObjectContainer ;
 		internal var timer:Timer ;
 		
-		public function State( Nevada:DisplayObjectContainer, timeout:Number = 0 )
+		public function State( nevada:DisplayObjectContainer, timeout:Number = 0 )
 		{
 			super( );
-			this.Nevada = Nevada ;
+			this.nevada = nevada ;
 			uicomponent = new UIComponent( );
 			components = new Array( );
 			inputs = new Object( );
@@ -43,7 +43,7 @@
 			//	N.B.:	We're doing this before so that
 			//	child components don't flame out if they
 			//	reference the stage during the run event
-			Nevada.addChild( uicomponent );
+			nevada.addChild( uicomponent );
 
 			//	N.B.:  You must iterate over the array to ensure that
 			//	components are added to the uicomponent in the correct order
@@ -77,6 +77,11 @@
 				//	Get the next state
 				var next:String ;
 				if ( event.type == StateEvent.TIMEOUT ) {
+					//	Go through each transition and execute it
+					if ( input[ 0].transitions ) {
+						for each ( var transition:Transition in input[ 0 ].transitions )
+							transition.execute();
+					}
 					next = input[ 0].next ;
 				} else {
 					//	First find the row
@@ -87,14 +92,16 @@
 					}
 					
 					//	Go through each transition and execute it
-					for each ( var transition:Transition in input[ i ].transitions )
-						transition.execute();
+					if ( input[ i].transitions ) {
+						for each ( transition in input[ i ].transitions )
+							transition.execute();
+					}
 					
 					//	Go to the next state
 					next = input[i].next ;
 				} 
 				if ( next ) {
-					Nevada.removeChild( uicomponent );
+					nevada.removeChild( uicomponent );
 					
 					//	Take the kids out
 					for each ( var child:DisplayObject in uicomponent )

@@ -7,7 +7,7 @@ package com.madsystems.components.map
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.geom.Point;;
+	import flash.geom.Point;
 			
 	internal class Map extends Component
 	{
@@ -15,19 +15,19 @@ package com.madsystems.components.map
 		public var maps:Array ;
 		private var index:int = 0 ;
 		internal var sprite:Sprite ;
-		//private var tween:Tween ;
-		//private var point:Point ;
 		private var speed:Number ;
 		private var zoom:Number ;
+		
+		//	The target zoom
 		private var scale:Number ;
-		//private var location:Point ;
+		private var overlays:Array ;
 		
 		internal static const MAP_WINDOW_WIDTH:int = 1920 ;
 		internal static const MAP_WINDOW_HEIGHT:int = 1080 ;
 		private var MAP_WIDTH:int ;
 		private var MAP_HEIGHT:int ;
 		
-		public function Map( files:Array, maps:Array, width:Number, height:Number, speed:Number = .25 )
+		public function Map( files:Array, maps:Array, width:Number, height:Number, speed:Number = .25, overlays:Array = null )
 		{
 			super( );
 			MAP_WIDTH = width ;
@@ -36,6 +36,7 @@ package com.madsystems.components.map
 			this.maps = maps ;
 			this.speed = speed ;
 			this.zoom = 1 ;
+			this.overlays = overlays ;
 			
 			//	Listen for state events
 			addEventListener( StateEvent.RUN, run ) ;
@@ -94,6 +95,7 @@ package com.madsystems.components.map
 							reverse: element.reverse,
 							color: element.color,
 							thickness: element.thickness,
+							arclength: element.arclength,
 							id: element.id
 						};
 						for each ( var path:Array in element.paths ) 
@@ -109,42 +111,15 @@ package com.madsystems.components.map
 		override public function run( event:Event ):void {
 			trace("run("+event+")");
 			if ( !hasEventListener( Event.ENTER_FRAME ))
-				addEventListener( Event.ENTER_FRAME, frame );			
-//			if ( tween ) {
-//				tween.addEventListener( TweenEvent.MOTION_CHANGE, animate );
-//				tween.addEventListener( TweenEvent.MOTION_FINISH, animate );
-//				tween.start( );
-//			}
+				addEventListener( Event.ENTER_FRAME, frame );		
+			start( paths[ index ] );	
 		}
 		
 		override public function next( event:Event ):void {
 			if ( hasEventListener( Event.ENTER_FRAME ))
 				removeEventListener( Event.ENTER_FRAME, frame );
-			//	Stop the tween
-			//tween.stop( ) ;
 		}
-		
-		
-//		private function animate( event:TweenEvent ):void 
-//		{	
-//			sprite.graphics.clear( );
-//			var t:Number = ( tween.time / tween.duration );
-//			var object:Object ;
-//			var j:int= 0 ;
-//			while ( j < index ) 
-//				draw( 1, paths[ j++ ] ); 
-//			if ( event.type == TweenEvent.MOTION_FINISH ) {
-//				tween.stop( ); tween.rewind( ); 
-//				if ( !drawn( paths[ index ] ))
-//					tween.start( );
-//				else {
-//					dispatchEvent( new Event( Event.COMPLETE ));
-//					return ;	
-//				}
-//			}
-//			location =  draw( t, paths[ index ] );
-//		}	
-		
+			
 		private function frame( event:Event ):void {
 			if ( marked( paths[ index ])) {
 				dispatchEvent( new Event( Event.COMPLETE ));
@@ -159,9 +134,12 @@ package com.madsystems.components.map
 				
 			//	Draw by arc length
 			var point:Point =  arc( paths[ index ] );
-
-			zoom += ( scale - zoom ) * .125 ;
+			zoom += ( scale - zoom ) * .0625 ;
 			if ( point ) {
+				
+				//	Draw the overlays
+				if ( overlays )
+					overlay( overlays, point ) ;
 				
 				//	Scale the point
 				point.x *= zoom ; point.y *= zoom ;
@@ -188,10 +166,8 @@ package com.madsystems.components.map
 				sprite.y += ( dy - sprite.y ) * .125 ;
 				
 				//	Keep the map from scrolling off the screen 
-				sprite.x = ( Math.min( Math.max( Math.floor( sprite.x ), Map.MAP_WINDOW_WIDTH - ( MAP_WIDTH * zoom )), 0 )) ;
-				sprite.y = ( Math.min( Math.max( Math.floor( sprite.y ), Map.MAP_WINDOW_HEIGHT - ( MAP_HEIGHT * zoom )), 0 )) ;
-
-				//	tiles.render( new Point( sprite.x, sprite.y ));
+				sprite.x = Math.min( Math.floor( sprite.x ), 0 ); 
+				sprite.y = Math.min( Math.floor( sprite.y ), 0 ); 
 				for each ( map in maps ) {
 					if ( map is Map ) {
 						( map as Map ).sprite.x = sprite.x ;
@@ -203,7 +179,32 @@ package com.madsystems.components.map
 				}
 			}
 		}
-		
+		private function overlay( overlays:Array, location:Point ):void {
+			//	Kill the line style
+			sprite.graphics.lineStyle( );
+			
+						
+			//	Go through each overlay
+			//	If the current zoom is greater than 
+			//	or equal to the current zoom threshold
+			//	and the current location is close enough
+			//	the location point, display it
+			//	Hide each currently visible overlay
+			//	that doesn't meet those conditions
+			for ( var i:int = 0; i < overlays.length; i++ ) {
+				var overlay:Object = overlays[ i];
+				var x0:Number = overlay.x - overlays[0].x ;
+				var y0:Number = overlay.y - overlays[0].y ;
+				var dx:Number = location.x - overlays[0].x ;
+				var dy:Number = location.y - overlays[0].y ;
+				var show:Boolean = ( zoom >= overlay.zoom ) ;
+				show = show &&  (( dx * dx + dy * dy ) > ( x0 * x0 + y0 * y0 )); 
+				overlay.alpha += ( Number( show ) - overlay.alpha ) * .5 ;
+				sprite.graphics.beginFill( overlay.color, overlay.alpha ) ;
+				sprite.graphics.drawCircle( overlay.x, overlay.y, 5 );
+				sprite.graphics.endFill();
+			}
+		}
 		private function arc( object:* ):Point {
 			var point:Point ;
 			if ( object is Array ) {
@@ -223,8 +224,8 @@ package com.madsystems.components.map
 				point = (( object as Path ).arc(  ) as Point ).clone();
 			}
 			return point ;
-			
 		}
+
 		private function marked( object:* ):Boolean {
 			var marked:Boolean = true ;
 			if ( object is Array ) {
@@ -235,10 +236,24 @@ package com.madsystems.components.map
 			} else if ( object is Path ) {
 				marked = ( object as Path ).marked( );
 			}
-			if ( marked )
-				return ( ++index >= paths.length ) ;
+			if ( marked && ++index < paths.length ) {
+				start( paths[ index ] );
+				return true ;
+			}
 			return false ;
 			
+		}
+		
+		private function start( object:* ):void {
+			if ( object is Array ) {
+				for ( var i:int = 0; i < object.length; i++ ) {
+					var type:String = "route-start-" + ( object[i] as Path ).id ;
+					dispatchEvent( new Event( type ));
+				}
+			} else if ( object is Path ) {
+				type = "route-start-" + ( object as Path ).id ;
+				dispatchEvent( new Event( type ));
+			}			
 		}
 		private function drawn( object:* ):Boolean {
 			var drawn:Boolean = true ;

@@ -36,15 +36,16 @@
 							var reverse:Boolean = ( route.@reverse.toString() == "true" );
 							var color:Number = Number( route.@color.toString() );
 							var thickness:Number = Number( route.@thickness.toString() );
+							var arclength:Number = Number( route.@arclength.toString() );
 							var id:String = route.@id.toString( );
-							array.push( { url: url, reverse: reverse, color: color, thickness: thickness, id: id });
+							array.push( { url: url, reverse: reverse, color: color, thickness: thickness, id: id, arclength: arclength });
 						}
 					}
 					return array ;
 				})( component.routes.*, [] ) ;
 	
 					
-				//	Create the map
+				//	Create the map backgrounds
 				var maps:Array = new Array( );
 				for each ( var graphic:XML in component.background.* ) {
 					maps.push( ComponentFactory.create( graphic ));
@@ -54,7 +55,22 @@
 				var width:Number = Number( component.@width.toString( ));
 				var height:Number = Number( component.@height.toString( ));
 				var speed:Number = Number( component.@speed.toString( ));
-				map = new Map( routes, maps, width, height, speed );
+
+				//	Create the map overlays
+				var overlays:Array = new Array( );
+				for each ( var overlay:XML in component.overlays.* ) {
+					var object:Object = new Object( );
+					object.x = Number( overlay.@x.toString( ));
+					object.y = Number( overlay.@y.toString( ));
+					object.color = Number( overlay.@color.toString( ));
+					object.zoom = Number( overlay.@zoom.toString( ));
+					object.alpha = 0 ;
+					overlays.push( object );
+				}
+				if ( overlays.length )
+					map = new Map( routes, maps, width, height, speed, overlays );
+				else map = new Map( routes, maps, width, height, speed );
+
 			}
 			components[ component.@id ] = map ;
 			return map ;

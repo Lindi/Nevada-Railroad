@@ -11,14 +11,14 @@
 	{
 		public var state:State ;
 		public var states:Object = {};
-		private var Nevada:DisplayObjectContainer ;
+		private var nevada:DisplayObjectContainer ;
 		
-		public function StateMachine( Nevada:DisplayObjectContainer )
+		public function StateMachine( nevada:DisplayObjectContainer )
 		{
-			this.Nevada = Nevada ;
-			Nevada.addEventListener( Event.COMPLETE,
+			this.nevada = nevada ;
+			nevada.addEventListener( Event.COMPLETE,
 				function ( event:Event ):void {
-					Nevada.removeEventListener( Event.COMPLETE, arguments.callee );
+					nevada.removeEventListener( Event.COMPLETE, arguments.callee );
 					addEventListeners( state );
 					state.run();
 				});
