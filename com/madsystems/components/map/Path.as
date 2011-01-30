@@ -10,7 +10,7 @@
 		private var sprite:Sprite ;
 		private var paths:Array ;
 		//private var s:Number ;
-		private var index:int  ;
+		private var index:int = 0 ;
 		
 		//	The length that was drawn on the last curve
 		private var length:Number ;
@@ -69,14 +69,16 @@
 			var j:int= 0 ;
 			while ( j < index )
 				mark( paths[ j++ ], 1 );
-			do {
-				var ds:Number = Math.min( length, paths[ j ].length );
-				var t:Number = ds / paths[ j ].length ;
-				location = mark( paths[ j ], t ) ;
-				if ( ds == paths[ j ].length ) {
-					length -= paths[ j++ ].length ;
-				}
-			} while ( j < paths.length && length > paths[ j ].length )
+			if ( j < paths.length ) {
+				do {
+					var ds:Number = Math.min( length, paths[ j ].length );
+					var t:Number = ds / paths[ j ].length ;
+					location = mark( paths[ j ], t ) ;
+					if ( ds == paths[ j ].length ) {
+						length -= paths[ j++ ].length ;
+					}
+				} while ( j < paths.length && length > paths[ j ].length )
+			}
 			length += s ;
 			index = j ;
 			return location ;

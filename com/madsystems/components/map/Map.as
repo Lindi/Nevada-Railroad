@@ -246,13 +246,20 @@ package com.madsystems.components.map
 		
 		private function start( object:* ):void {
 			if ( object is Array ) {
+				var type:String  ;
 				for ( var i:int = 0; i < object.length; i++ ) {
-					var type:String = "route-start-" + ( object[i] as Path ).id ;
-					dispatchEvent( new Event( type ));
+					var event:String = "route-start-" + ( object[i] as Path ).id ;
+					if ( event != type ) {
+						dispatchEvent( new Event( event ));
+						type = event ;
+					}
 				}
 			} else if ( object is Path ) {
-				type = "route-start-" + ( object as Path ).id ;
-				dispatchEvent( new Event( type ));
+				event = "route-start-" + ( object as Path ).id ;
+				if ( event != type ) {
+					dispatchEvent( new Event( event ));
+					type = event ;
+				}
 			}			
 		}
 		private function drawn( object:* ):Boolean {
