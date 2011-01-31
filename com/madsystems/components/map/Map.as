@@ -7,7 +7,10 @@ package com.madsystems.components.map
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
+	import flash.events.TimerEvent;
 	import flash.geom.Point;
+	import flash.utils.Timer;
 			
 	internal class Map extends Component
 	{
@@ -15,8 +18,8 @@ package com.madsystems.components.map
 		public var maps:Array ;
 		private var index:int = 0 ;
 		internal var sprite:Sprite ;
-		private var speed:Number ;
 		private var zoom:Number ;
+		private var scroll:Boolean ;
 		
 		//	The target zoom
 		private var scale:Number ;
@@ -27,16 +30,17 @@ package com.madsystems.components.map
 		private var MAP_WIDTH:int ;
 		private var MAP_HEIGHT:int ;
 		
-		public function Map( files:Array, maps:Array, width:Number, height:Number, speed:Number = .25, overlays:Array = null )
+		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:Array = null )
 		{
 			super( );
 			MAP_WIDTH = width ;
 			MAP_HEIGHT = height ;			
 			this.scale = Math.min( 1, Map.MAP_WINDOW_WIDTH/MAP_WIDTH );
 			this.maps = maps ;
-			this.speed = speed ;
 			this.zoom = 1 ;
 			this.overlays = overlays ;
+			this.scroll = scroll ;
+			
 			
 			//	Listen for state events
 			addEventListener( StateEvent.RUN, run ) ;
@@ -104,10 +108,8 @@ package com.madsystems.components.map
 				}
 				return array ;
 			})( json, [] ) ;
-			
-			//	Create the tween
-			//tween = new Tween( {}, "", None.easeNone, 0, 1, speed, true ) ;
 		}
+
 		override public function run( event:Event ):void {
 			trace("run("+event+")");
 			if ( !hasEventListener( Event.ENTER_FRAME ))
@@ -134,6 +136,10 @@ package com.madsystems.components.map
 				
 			//	Draw by arc length
 			var point:Point =  arc( paths[ index ] );
+			
+			if ( !scroll )
+				return ;
+				
 			zoom += ( scale - zoom ) * .0625 ;
 			if ( point ) {
 				
@@ -183,7 +189,6 @@ package com.madsystems.components.map
 			//	Kill the line style
 			sprite.graphics.lineStyle( );
 			
-						
 			//	Go through each overlay
 			//	If the current zoom is greater than 
 			//	or equal to the current zoom threshold
@@ -202,9 +207,10 @@ package com.madsystems.components.map
 				overlay.alpha += ( Number( show ) - overlay.alpha ) * .5 ;
 				sprite.graphics.beginFill( overlay.color, overlay.alpha ) ;
 				sprite.graphics.drawCircle( overlay.x, overlay.y, 5 );
-				sprite.graphics.endFill();
+				sprite.graphics.endFill( );
 			}
 		}
+		
 		private function arc( object:* ):Point {
 			var point:Point ;
 			if ( object is Array ) {
@@ -236,11 +242,11 @@ package com.madsystems.components.map
 			} else if ( object is Path ) {
 				marked = ( object as Path ).marked( );
 			}
-			if ( marked && ++index < paths.length ) {
+			if ( !marked || ++index < paths.length ) {
 				start( paths[ index ] );
-				return true ;
+				return false ;
 			}
-			return false ;
+			return true ;
 			
 		}
 		
@@ -262,6 +268,9 @@ package com.madsystems.components.map
 				}
 			}			
 		}
+		
+		
+
 		private function drawn( object:* ):Boolean {
 			var drawn:Boolean = true ;
 			if ( object is Array ) {
