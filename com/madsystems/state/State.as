@@ -9,7 +9,6 @@
 	import flash.events.IEventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
-	import flash.display.Sprite ;
 	
 	import mx.core.UIComponent;;
 	
@@ -18,10 +17,11 @@
 		
 		//	In Java, these should be final
 		public var components:Array ;
-		public var inputs:Object ;
+		internal var inputs:Object ;
 		public var id:String ;
 		public var uicomponent:UIComponent ;
 		public var nevada:DisplayObjectContainer ;
+		internal var transitions:Array ;
 		internal var timer:Timer ;
 		
 		public function State( nevada:DisplayObjectContainer, timeout:Number = 0 )
@@ -51,6 +51,8 @@
 				var component:Object = components[ i ] ;
 				if ( component is DisplayObject )
 					show(( component as DisplayObject ), uicomponent, i );
+				for each ( var transition:Transition in transitions )
+					transition.execute();
 				if ( component is IEventDispatcher )
 					( component as IEventDispatcher ).dispatchEvent( new StateEvent( StateEvent.RUN ));
 			}
@@ -101,11 +103,18 @@
 					next = input[i].next ;
 				} 
 				if ( next ) {
+					//	N.B.:  You must iterate over the array to ensure that
+					//	components are added to the uicomponent in the correct order
+					for ( i = 0; i < components.length; i++ ) {
+						component = components[ i ] ;
+						if ( component is IEventDispatcher )
+							( component as IEventDispatcher ).dispatchEvent( new StateEvent( StateEvent.NEXT ));
+						if ( component is DisplayObject )
+							hide(( component as DisplayObject ), uicomponent );
+					}
+
 					nevada.removeChild( uicomponent );
 					
-					//	Take the kids out
-					for each ( var child:DisplayObject in uicomponent )
-						hide( child, uicomponent );
 					
 					//	Kill the timeout timer if there is one
 					if ( timer )
@@ -152,10 +161,10 @@
 		 * Removes a display object from the main display object container
 		 **/ 
 		private function hide( displayObject:DisplayObject, container:DisplayObjectContainer ):void {
-//			if ( !container )
-//				return ;
-//			if ( !displayObject )
-//				return ;
+			if ( !container )
+				return ;
+			if ( !displayObject )
+				return ;
 			if ( container.contains( displayObject )) {
 				container.removeChild( displayObject ) ;
 			}			

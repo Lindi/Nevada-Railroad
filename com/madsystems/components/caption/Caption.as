@@ -21,13 +21,12 @@ package com.madsystems.components.caption
 		private var caption:String ;
 		private var sprite:Sprite ;
 		private var timer:Timer ;
-		private var blend:Number
+		private var blend:Number ;
 		
-		public function Caption( color:int, blend:Number = .2 ) 
+		public function Caption( color:int, blend:Number = .5 ) 
 		{  
 			super();
 			var format:TextFormat = new TextFormat( );
-			//var myFont:Font = new Satero( );
 			format.font = "Satero Serif LT Pro" ; //myFont.fontName ; //"Satero Serif LT Pro" ; 
 			format.bold = true ;
 			format.size = 32 ;
@@ -48,14 +47,15 @@ package com.madsystems.components.caption
 			addEventListener( StateEvent.NEXT, next );
 			timer = new Timer( 20 );
 			timer.addEventListener( TimerEvent.TIMER, frame );
+			this.blend = blend ;
 		}
 		override public function run( event:Event ):void {
 			caption = text.concat();			
 			addChild( sprite ) ;
 			addChild( textField );
-			//addEventListener( Event.ENTER_FRAME, frame );
 			timer.reset();
 			timer.start();
+			textField.text = "" ;
 		}
 		override public function next( event:Event ):void {
 			removeChild( sprite );
@@ -69,15 +69,16 @@ package com.madsystems.components.caption
 				return ;
 			textField.appendText(caption.substr(0,1));
 			caption = caption.substring(1);
-			
+		
 			var x:int = textField.x/2 ;
 			var w:int = ( textField.x - textField.x/2 );
 			sprite.graphics.clear();
-			sprite.graphics.beginFill( 0xffffff, .2);
+			sprite.graphics.beginFill( 0xffffff, blend );
 			sprite.graphics.drawRect( x, 0, 2 * w + textField.textHeight, stage.stageHeight );
 			sprite.graphics.endFill();
 			if ( !caption.length ) {
 				timer.stop();
+				
 				//	Dispatch the complete event a second
 				//	after the caption has completed
 				var t:Timer = new Timer( 1000, 1 );

@@ -7,6 +7,7 @@
 	import com.madsystems.components.loop.LoopFactory;
 	import com.madsystems.components.map.MapFactory;
 	import com.madsystems.components.sound.SoundFactory;
+	import com.madsystems.components.background.BackgroundFactory;
 	
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -34,6 +35,7 @@
 			factories[ "button" ] = new ButtonFactory( );
 			factories[ "gallery" ] = new GalleryFactory( );
 			factories[ "sound" ] = new SoundFactory( );
+			factories[ "background" ] = new BackgroundFactory( );
 			
 			//	We can do this because we only call this function from one
 			//	place in the application

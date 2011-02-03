@@ -16,6 +16,7 @@
 			var id:String = component.@id.toString();
 			var color:Number = Number( component.@color.toString( ));
 			var blend:Number = Number( component.@blend.toString( ));
+			blend = ( blend ? blend : .2 ) ;
 			var object:Object = builder.create( { id: id, color: color, blend: blend } );
 			if ( object )
 				return object ;
@@ -45,7 +46,7 @@ class CaptionBuilder extends Builder
 		var blend:Number = Number( object.blend );
 
 		//	Create a bitmap reference to be returned synchrononously
-		caption = new Caption( color );
+		caption = new Caption( color, blend );
 		return null ;
 	}
 	override public function build( component:XML ):Object {

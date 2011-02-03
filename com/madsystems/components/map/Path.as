@@ -16,13 +16,13 @@
 		private var length:Number ;
 		
 		//	The arc length
-		private var s:Number ; //1000 ;
-		
+		private var s:Number ; 
 		
 		
 		public var location:Point ;
 		private var thickness:int ;
 		private var color:Number ;
+		private var percent:Number = 0 ;
 		public var id:String ;
 		public var enabled:Boolean = true ;
 		public var rectangle:Rectangle = new Rectangle( );
@@ -30,26 +30,15 @@
 		public function Path( paths:Array, sprite:Sprite, properties:Object )
 		{
 			this.paths = paths ;
-			if ( properties.reverse )
-				paths.reverse( );
 			this.id = properties.id ;
 			this.sprite = sprite ;
 			this.location = new Point( );
-			this.length = this.s = ( properties.arclength? properties.arclength : 5 ) ;
+			this.length = this.s = ( properties.arclength ? properties.arclength : 5 ) ;
 			this.thickness = ( properties.hasOwnProperty( "thickness" ) ? int( properties.thickness ) : 1 ) ;
+			this.percent = ( !isNaN( properties.percent ) ? properties.percent : 0 );
 			this.color = ( properties.hasOwnProperty( "color" ) ? Number( properties.color ) : 0xffffff ) ;
 		}
 		
-		
-		private function reverse( paths:Array ):void {
-			paths.reverse() ;
-			for each ( var path:Object in paths ) {
-				if ( path.hasOwnProperty("curve"))
-					( path.line as Array ).reverse( );
-				else if ( path.hasOwnProperty("line"))
-					( path.curve as Array ).reverse( );
-			}
-		}
 
 
 		public function drawn( ):Boolean {			
@@ -61,6 +50,10 @@
 		
 		public function marked( ):Boolean {
 			return ( index >= paths.length );
+		}
+		
+		public function reset( ):void {
+			index = int( paths.length * percent ) ;
 		}
 		
 		public function arc(  ):Point  
@@ -86,8 +79,8 @@
 		}
 		
 		
-		public function draw( p:Number ):Point {
-			
+		public function draw( p:Number ):Point 
+		{
 			var j:int= 0 ;
 			while ( j < index )
 				mark( paths[ j++ ], 1 );
