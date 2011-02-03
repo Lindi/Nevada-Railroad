@@ -57,6 +57,8 @@
 				var height:Number = Number( component.@height.toString( ));
 				var speed:Number = Number( component.@speed.toString( ));
 				var scroll:Boolean = ( component.@scroll ? ( component.@scroll.toString( ) == "true" ? true : false ) : false ) ;
+				var autoStart:Boolean = ( ( component.attribute("autoStart") as XMLList ).length() ? ( component.@autoStart.toString( ) == "true" ? true : false ) : true ) ;
+
 
 				//	Create the map overlays
 				var overlays:Array = new Array( );
@@ -75,8 +77,8 @@
 					overlays.push( object );
 				}
 				if ( overlays.length )
-					map = new Map( routes, maps, width, height, scroll, overlays );
-				else map = new Map( routes, maps, width, height, scroll );
+					map = new Map( routes, maps, width, height, scroll, overlays, autoStart );
+				else map = new Map( routes, maps, width, height, scroll, null, autoStart );
 
 			}
 			components[ component.@id ] = map ;

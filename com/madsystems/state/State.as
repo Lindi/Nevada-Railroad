@@ -47,10 +47,10 @@
 
 			//	N.B.:  You must iterate over the array to ensure that
 			//	components are added to the uicomponent in the correct order
-			for ( var i:int = 0; i < components.length; i++ ) {
+			for ( var i:int = 0, j:int = 0; i < components.length; i++ ) {
 				var component:Object = components[ i ] ;
 				if ( component is DisplayObject )
-					show(( component as DisplayObject ), uicomponent, i );
+					show(( component as DisplayObject ), uicomponent, j++ );
 				for each ( var transition:Transition in transitions )
 					transition.execute();
 				if ( component is IEventDispatcher )
@@ -150,8 +150,8 @@
 				trace( ( displayObject as DisplayObjectContainer ).numChildren );
 			//if ( !container.contains( displayObject )) {
 				if ( displayObject.parent is DisplayObjectContainer ) 
-					container.addChildAt( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ), index )
-				else container.addChildAt( displayObject, index );
+					container.addChild( ( displayObject.parent as DisplayObjectContainer ).removeChild( displayObject ));//, index )
+				else container.addChild( displayObject ); //, index );
 			//}
 			trace("show("+container.getChildIndex( displayObject )+")");
 		}

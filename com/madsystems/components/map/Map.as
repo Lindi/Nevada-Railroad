@@ -25,13 +25,14 @@ package com.madsystems.components.map
 		//	The target zoom
 		private var scale:Number ;
 		private var overlays:Array ;
+		private var autoStart:Boolean ;
 		
 		internal static const MAP_WINDOW_WIDTH:int = 1920 ;
 		internal static const MAP_WINDOW_HEIGHT:int = 1080 ;
 		private var MAP_WIDTH:int ;
 		private var MAP_HEIGHT:int ;
 		
-		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:Array = null )
+		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:Array = null, autoStart:Boolean = true )
 		{
 			super( );
 			MAP_WIDTH = width ;
@@ -41,7 +42,7 @@ package com.madsystems.components.map
 			this.zoom = 1 ;
 			this.overlays = overlays ;
 			this.scroll = scroll ;
-			
+			this.autoStart = autoStart ;
 			
 			//	Listen for state events
 			addEventListener( StateEvent.RUN, run ) ;
@@ -135,14 +136,16 @@ package com.madsystems.components.map
 		
 		override public function run( event:Event ):void {
 			trace("run("+event+")");
+			if ( autoStart )
+				play( );
+		}
+		
+		public function play( ):void {
 			if ( !hasEventListener( Event.ENTER_FRAME ))
 				addEventListener( Event.ENTER_FRAME, frame );
-				
-			
 			//	Start the map
 			start( paths[ index ] );	
 		}
-		
 		
 		
 		override public function next( event:Event ):void {
@@ -201,6 +204,9 @@ package com.madsystems.components.map
 				//	Keep the map from scrolling off the screen 
 				sprite.x = Math.min( Math.floor( sprite.x ), 0 ); 
 				sprite.y = Math.min( Math.floor( sprite.y ), 0 ); 
+				sprite.x = Math.max( sprite.x, Map.MAP_WINDOW_WIDTH - MAP_WIDTH * zoom );
+				sprite.y = Math.max( sprite.y, Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT * zoom );
+				
 				for each ( map in maps ) {
 					if ( map is Map ) {
 						( map as Map ).sprite.x = sprite.x ;
@@ -242,8 +248,6 @@ package com.madsystems.components.map
 					sprite.addChild( overlay.image.bitmap as DisplayObject );
 				else if ( !show && sprite.contains( overlay.image.bitmap as DisplayObject ))
 					sprite.removeChild( overlay.image.bitmap  as DisplayObject );
-				
-				
 			}
 		}
 		
