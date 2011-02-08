@@ -14,9 +14,9 @@
 	{
 		public var stateMachine:StateMachine ;
 					
-		public function StateMachineBuilder( Nevada:DisplayObjectContainer ) {
+		public function StateMachineBuilder( main:DisplayObjectContainer, url:String ) {
 			
-			stateMachine = new StateMachine( Nevada );
+			stateMachine = new StateMachine( main );
 			
 			
 			//	Use an anonymous function reference
@@ -29,7 +29,7 @@
 					
 					
 					//	Grab the XML and build the states
-					build( new XML( loader.data ), Nevada );
+					build( new XML( loader.data ), main );
 										
 
 				};
@@ -37,7 +37,7 @@
 			//	Load the state xml configuration
 			var loader:URLLoader = new URLLoader( );
 			loader.addEventListener( Event.COMPLETE, listener );
-			var request:URLRequest = new URLRequest( "states.xml" );
+			var request:URLRequest = new URLRequest( url );
 			try {
 				loader.load(request);
 			} catch (error:Error) {
@@ -45,10 +45,10 @@
 			}
 		}
 
-		private function build( application:XML, Nevada:DisplayObjectContainer ):void { //state:State, inputs:XMLList, components:XMLList, root:XML ):StateMachineBuilder {
+		private function build( application:XML, main:DisplayObjectContainer ):void { //state:State, inputs:XMLList, components:XMLList, root:XML ):StateMachineBuilder {
 			
 //					//	Create a factory to load the factory classes
-			var factory:ComponentFactory = (ComponentFactory.getInstance()).initiatlize( Nevada );
+			var factory:ComponentFactory = (ComponentFactory.getInstance()).initiatlize( main );
 
 			//	Listen for when it's complete
 			factory.dispatcher.addEventListener( Event.COMPLETE, complete );
@@ -72,8 +72,8 @@
 				
 				//	Create the new state
 				if ( state.@timeout ) 
-					stateMachine.states[ state.@id ] = new State( Nevada, Number( state.@timeout.toString()));
-				else stateMachine.states[ state.@id ] = new State( Nevada );
+					stateMachine.states[ state.@id ] = new State( main, state.@id.toString( ), Number( state.@timeout.toString()));
+				else stateMachine.states[ state.@id ] = new State( main, state.@id.toString( ));
 
 				//	Set its id
 				( stateMachine.states[ state.@id ] as State ).id = state.@id.toString();

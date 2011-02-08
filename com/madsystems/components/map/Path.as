@@ -4,6 +4,8 @@
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.display.CapsStyle ;
+	import flash.display.JointStyle ;
 	
 	public class Path
 	{
@@ -62,6 +64,7 @@
 			var j:int= 0 ;
 			while ( j < index )
 				mark( paths[ j++ ], 1 );
+				
 			if ( j < paths.length ) {
 				do {
 					var ds:Number = Math.min( length, paths[ j ].length );
@@ -70,9 +73,11 @@
 					if ( ds == paths[ j ].length ) {
 						length -= paths[ j++ ].length ;
 					}
-				} while ( j < paths.length && length > paths[ j ].length )
+				} while ( j < paths.length && length > paths[ j ].length  )
 			}
-			length += s ;
+			if ( length < s )
+				length += ( s - length );
+			else length += s ;
 			index = j ;
 			return location ;
 			
@@ -147,7 +152,7 @@
 			var c:Object = curve[ 2] as Object ;
 			var p:Point = new Point( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t );
 			var q:Point = new Point( p.x + ( c.x - p.x ) * t, p.y + ( c.y - p.y ) * t );
-			graphics.lineStyle( thickness, color, 1 );
+			graphics.lineStyle( thickness, color, 1, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
 			graphics.moveTo( a.x, a.y );
 			graphics.curveTo( p.x, p.y, q.x, q.y );
 			var r:Point = new Point( );

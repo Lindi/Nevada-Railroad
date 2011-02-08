@@ -7,11 +7,19 @@ package com.madsystems.components.map
 	import fl.transitions.TweenEvent;
 	import fl.transitions.easing.None;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.BlendMode ;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.filters.BlurFilter;
 	import flash.geom.Point;
+	import flash.geom.ColorTransform;
+	import flash.geom.Matrix;
+	import flash.geom.Rectangle ;
+
 			
 	internal class Map extends Component
 	{
@@ -21,7 +29,10 @@ package com.madsystems.components.map
 		internal var sprite:Sprite ;
 		private var zoom:Number ;
 		private var scroll:Boolean ;
-
+		private var blur:Bitmap ;
+		private var filter:BlurFilter = new BlurFilter( 10, 10, .85 );
+		private var matrix:Matrix ;
+			
 		//	The target zoom
 		private var scale:Number ;
 		private var overlays:Array ;
@@ -48,9 +59,18 @@ package com.madsystems.components.map
 			addEventListener( StateEvent.RUN, run ) ;
 			addEventListener( StateEvent.NEXT, next );
 			
+			//	You'll have a glow on this
+			blur = addChild( new Bitmap( new BitmapData( Map.MAP_WINDOW_WIDTH, Map.MAP_WINDOW_HEIGHT, true, 0 ))) as Bitmap ;
+			//blur.blendMode = BlendMode.HARDLIGHT ;
+			//blur.filters = [ filter ];
+			
 			//	The paths will draw on this 
-			sprite = addChild( new Sprite( )) as Sprite ;
-
+			//	Do we need to add this sprite to the display list
+			//	if we're rendering it to a bitmap
+			sprite = new Sprite( ); //addChild( new Sprite( )) as Sprite ;
+			//	sprite.visible = false
+			 ;
+			
 			//	Keep track of the number of loaders
 			var loaders:int ;
 			
@@ -115,6 +135,9 @@ package com.madsystems.components.map
 
 		public function reset( reset:Boolean ):void {
 			if ( reset ) {
+				//	Clear the sprite
+				sprite.graphics.clear();
+				
 				//	Reset the index	
 				index = 0 ;
 				
@@ -186,8 +209,8 @@ package com.madsystems.components.map
 				//	Scale the maps
 				for each ( var map:DisplayObject in maps ) {
 					if ( map is Map ) {
-						( map as Map ).sprite.scaleX = zoom ;
-						( map as Map ).sprite.scaleY = zoom ;
+//						( map as Map ).sprite.scaleX = zoom ;
+//						( map as Map ).sprite.scaleY = zoom ;
 					} else {
 						map.scaleX = map.scaleY = zoom ;
 					}
@@ -207,16 +230,62 @@ package com.madsystems.components.map
 				sprite.x = Math.max( sprite.x, Map.MAP_WINDOW_WIDTH - MAP_WIDTH * zoom );
 				sprite.y = Math.max( sprite.y, Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT * zoom );
 				
+				//	Copy the map pixels
+				copyPixels( sprite, sprite.x, sprite.y, zoom, zoom, 1 );
 				for each ( map in maps ) {
 					if ( map is Map ) {
-						( map as Map ).sprite.x = sprite.x ;
-						( map as Map ).sprite.y = sprite.y ;
+						copyPixels( ( map as Map ).sprite, sprite.x, sprite.y, sprite.scaleX, sprite.scaleY, sprite.alpha );
+//						( map as Map ).sprite.x = sprite.x ;
+//						( map as Map ).sprite.y = sprite.y ;
 					} else {
 						map.x = sprite.x ;
 						map.y = sprite.y ;
 					}
 				}
+				
+//				//	Draw the blur
+//				blur.bitmapData.fillRect( blur.bitmapData.rect, 0 );
+//				
+//				//	Create a matrix to translate to the part of the
+//				//	sprite image we're interested in
+//				//matrix.scale( zoom, zoom );
+//				matrix= new Matrix( );
+//				matrix.scale( zoom, zoom );
+//				matrix.tx = sprite.x ;
+//				matrix.ty = sprite.y ;
+//				
+//
+//				
+//				//	Create a color transform to turn it red
+//				blur.bitmapData.draw( sprite, matrix, xform );
+				
 			}
+		}
+		
+		private function copyPixels( sprite:Sprite, x:Number, y:Number, scaleX:Number = 1, scaleY:Number = 1, alpha:Number = 1):void {
+			//	Draw the map to a bitmap instead of moving the sprite around
+			//	Draw the blur
+			blur.bitmapData.fillRect( blur.bitmapData.rect, 0 );
+
+			//	Create a matrix to translate to the part of the
+			//	sprite image we're interested in
+			var matrix:Matrix = new Matrix( );
+			matrix.scale( scaleX, scaleY );
+			matrix.tx = x ;
+			matrix.ty = y ;
+			
+			//	Create a color transform to turn it red
+			//	The alpha can also be adjusted here
+			var transform:ColorTransform = new ColorTransform( 1, 0, 0, 1 );
+			
+			//	Create a blur filter ( keep one around so we don't have to create it repeatedly )
+			blur.bitmapData.draw( sprite, matrix, transform,BlendMode.NORMAL, new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight ))	 ;
+			blur.bitmapData.applyFilter( blur.bitmapData, new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight ), new Point(), filter );
+
+			//	Create a color transform to adjust the alpha of the path being drawn
+			transform = new ColorTransform( 1, 1, 1, 1 );
+			blur.bitmapData.draw( sprite, matrix, transform, null, new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight ))	 ;
+			
 		}
 		private function overlay( overlays:Array, location:Point ):void {
 			//	Kill the line style
@@ -312,10 +381,9 @@ package com.madsystems.components.map
 		}
 		
 		public function fade( alpha:Number ):void {
-			var map:DisplayObject = this ;
-			var tween:Tween = new Tween( {}, "", None.easeIn, map.alpha, alpha, 1, true ) ;
+			var tween:Tween = new Tween( {}, "", None.easeIn, sprite.alpha, alpha, 1, true ) ;
 			var listener:Function = function ( event:TweenEvent ):void {
-				map.alpha = tween.position;
+				sprite.alpha = tween.position;
 				if ( event.type == TweenEvent.MOTION_FINISH ) {
 					( event.target as Tween ).removeEventListener
 						( TweenEvent.MOTION_CHANGE, arguments.callee );

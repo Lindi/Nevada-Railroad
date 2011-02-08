@@ -10,7 +10,8 @@
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
-	import mx.core.UIComponent;;
+	//import mx.core.UIComponent;
+	import flash.display.Sprite;;
 	
 	public class State extends EventDispatcher implements IState
 	{
@@ -19,19 +20,22 @@
 		public var components:Array ;
 		internal var inputs:Object ;
 		public var id:String ;
-		public var uicomponent:UIComponent ;
+//		public var uicomponent:UIComponent ;
+		public var uicomponent:Sprite ;
 		public var nevada:DisplayObjectContainer ;
 		internal var transitions:Array ;
 		internal var timer:Timer ;
 		
-		public function State( nevada:DisplayObjectContainer, timeout:Number = 0 )
+		public function State( nevada:DisplayObjectContainer, id:String, timeout:Number = 0 )
 		{
 			super( );
 			this.nevada = nevada ;
-			uicomponent = new UIComponent( );
+//			uicomponent = new UIComponent( );
+			uicomponent = new Sprite( );
 			components = new Array( );
 			inputs = new Object( );
 			if ( timeout ) {
+				trace( "id " + id + " timeout " + timeout );
 				timer = new Timer( timeout, 1 );
 				timer.addEventListener( TimerEvent.TIMER_COMPLETE, this.timeout );
 			}
