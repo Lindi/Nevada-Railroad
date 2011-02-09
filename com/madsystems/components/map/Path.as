@@ -9,7 +9,7 @@
 	
 	public class Path
 	{
-		private var sprite:Sprite ;
+		public var sprite:Sprite ;
 		private var paths:Array ;
 		//private var s:Number ;
 		private var index:int = 0 ;
@@ -21,23 +21,27 @@
 		private var s:Number ; 
 		
 		
-		public var location:Point ;
+		internal var location:Point ;
 		private var thickness:int ;
 		private var color:Number ;
 		private var percent:Number = 0 ;
-		public var id:String ;
+		internal var id:String ;
 		public var enabled:Boolean = true ;
-		public var rectangle:Rectangle = new Rectangle( );
+		internal var rectangle:Rectangle = new Rectangle( );
+		internal var alpha:Number = 1 ;
+		private var sprites:Array ;
 		
-		public function Path( paths:Array, sprite:Sprite, properties:Object )
+		public function Path( paths:Array, sprites:Array, properties:Object )
 		{
 			this.paths = paths ;
 			this.id = properties.id ;
-			this.sprite = sprite ;
+			this.sprites = sprites ;
 			this.location = new Point( );
 			this.length = this.s = ( properties.arclength ? properties.arclength : 5 ) ;
 			this.thickness = ( properties.hasOwnProperty( "thickness" ) ? int( properties.thickness ) : 1 ) ;
 			this.percent = ( !isNaN( properties.percent ) ? properties.percent : 0 );
+			//trace( "percent: " + percent );
+//			this.index = int( paths.length * percent );
 			this.color = ( properties.hasOwnProperty( "color" ) ? Number( properties.color ) : 0xffffff ) ;
 		}
 		
@@ -103,17 +107,19 @@
 		 * @param - g: a graphics object reference
 		 * 
 		 **/ 
-		private function mark( path:Object, t:Number, g:Graphics = null ):Point
+		private function mark( path:Object, t:Number  ):Point
 		{
 			if ( path )
 			{
-				if ( !g ) g = sprite.graphics ;
-				if ( path.hasOwnProperty("line"))
-					return drawLine( path.line, g, t );
-				else if ( path.hasOwnProperty("curve"))
-					return drawBezier( path.curve, g, t );
+				var point:Point ;
+				for each ( var sprite:Sprite in sprites ) {
+					if ( path.hasOwnProperty("line"))
+						point = drawLine( path.line, sprite.graphics, t );
+					else if ( path.hasOwnProperty("curve"))
+						point = drawBezier( path.curve, sprite.graphics, t );
+				}
 			}
-			return location ;
+			return ( point ? point : location ) ;
 		}
 		
 		/**
@@ -152,7 +158,7 @@
 			var c:Object = curve[ 2] as Object ;
 			var p:Point = new Point( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t );
 			var q:Point = new Point( p.x + ( c.x - p.x ) * t, p.y + ( c.y - p.y ) * t );
-			graphics.lineStyle( thickness, color, 1, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
+			graphics.lineStyle( thickness, color, alpha, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
 			graphics.moveTo( a.x, a.y );
 			graphics.curveTo( p.x, p.y, q.x, q.y );
 			var r:Point = new Point( );
@@ -183,7 +189,7 @@
 			var a:Object = line[ 0] as Object ;
 			var b:Object = line[ 1] as Object ;
 			var p:Point = new Point( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t );
-			graphics.lineStyle( thickness, color, 1 );
+			graphics.lineStyle( thickness, color, alpha );
 			graphics.moveTo( a.x, a.y );
 			graphics.lineTo( p.x, p.y );
 			return p ;

@@ -33,13 +33,13 @@
 							array.push( arguments.callee( route.children(), [] ));
 						} else {
 							var url:String = route.@url.toString();
-							var reverse:Boolean = ( route.@reverse.toString() == "true" );
 							var color:Number = Number( route.@color.toString() );
 							var thickness:Number = Number( route.@thickness.toString() );
 							var arclength:Number = Number( route.@arclength.toString() );
 							var percent:Number = Number( route.@percent.toString( ));
+							//trace( "id: " + route.@id.toString( ) + " percent: " + route.@percent.toString( ) );
 							var id:String = route.@id.toString( );
-							array.push( { url: url, reverse: reverse, color: color, thickness: thickness, id: id, arclength: arclength });
+							array.push( { url: url, color: color, thickness: thickness, id: id, arclength: arclength, percent: percent });
 						}
 					}
 					return array ;

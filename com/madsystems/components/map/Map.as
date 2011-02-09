@@ -1,4 +1,4 @@
-package com.madsystems.components.map
+﻿package com.madsystems.components.map
 {
 	import com.madsystems.components.Component;
 	import com.madsystems.state.event.StateEvent;
@@ -26,17 +26,18 @@ package com.madsystems.components.map
 		public var paths:Array ;
 		public var maps:Array ;
 		private var index:int = 0 ;
-		internal var sprite:Sprite ;
+		//internal var sprite:Sprite ;
 		private var zoom:Number ;
 		private var scroll:Boolean ;
-		private var blur:Bitmap ;
-		private var filter:BlurFilter = new BlurFilter( 10, 10, .85 );
-		private var matrix:Matrix ;
+		private var filter:BlurFilter = new BlurFilter( 10, 10, 1 );
+		private var matrix:Matrix = new Matrix( );
 			
 		//	The target zoom
 		private var scale:Number ;
 		private var overlays:Array ;
 		private var autoStart:Boolean ;
+		private var position:Point = new Point( );
+		private var sprites:Array ;
 		
 		internal static const MAP_WINDOW_WIDTH:int = 1920 ;
 		internal static const MAP_WINDOW_HEIGHT:int = 1080 ;
@@ -59,17 +60,16 @@ package com.madsystems.components.map
 			addEventListener( StateEvent.RUN, run ) ;
 			addEventListener( StateEvent.NEXT, next );
 			
-			//	You'll have a glow on this
-			blur = addChild( new Bitmap( new BitmapData( Map.MAP_WINDOW_WIDTH, Map.MAP_WINDOW_HEIGHT, true, 0 ))) as Bitmap ;
-			//blur.blendMode = BlendMode.HARDLIGHT ;
-			//blur.filters = [ filter ];
 			
 			//	The paths will draw on this 
 			//	Do we need to add this sprite to the display list
 			//	if we're rendering it to a bitmap
-			sprite = new Sprite( ); //addChild( new Sprite( )) as Sprite ;
-			//	sprite.visible = false
-			 ;
+			sprites = new Array( );
+			var sprite:Sprite = addChild( new Sprite( )) as Sprite ;
+			sprite.filters = [ filter ] ;
+			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
+			sprites.push( sprite ) ;
+			sprites.push( addChild( new Sprite( )));
 			
 			//	Keep track of the number of loaders
 			var loaders:int ;
@@ -122,10 +122,11 @@ package com.madsystems.components.map
 							color: element.color,
 							thickness: element.thickness,
 							arclength: element.arclength,
+							percent: element.percent,
 							id: element.id
 						};
 						for each ( var path:Array in element.paths ) 
-							array.push( new Path( path, sprite, properties ));
+							array.push( new Path( path, sprites, properties ));
 					}
 				}
 				return array ;
@@ -136,7 +137,8 @@ package com.madsystems.components.map
 		public function reset( reset:Boolean ):void {
 			if ( reset ) {
 				//	Clear the sprite
-				sprite.graphics.clear();
+				for each ( var sprite:Sprite in sprites )
+					sprite.graphics.clear();
 				
 				//	Reset the index	
 				index = 0 ;
@@ -181,7 +183,10 @@ package com.madsystems.components.map
 				return ;
 			}
 				
-			sprite.graphics.clear( );
+			//glow.bitmapData.fillRect( glow.bitmapData.rect, 0 );					
+			for each ( var sprite:Sprite in sprites )
+				sprite.graphics.clear();
+				
 			var object:Object ;
 			var j:int= 0 ;
 			while ( j < index ) 
@@ -190,104 +195,100 @@ package com.madsystems.components.map
 			//	Draw by arc length
 			var point:Point =  arc( paths[ index ] );
 			
-			if ( !scroll )
-				return ;
 				
-			zoom += ( scale - zoom ) * .0625 ;
 			if ( point ) {
 				
 				//	Draw the overlays
 				if ( overlays )
-					overlay( overlays, point ) ;
+					overlay( overlays, point, sprites[ sprites.length - 1] as Sprite ) ;
 				
-				//	Scale the point
-				point.x *= zoom ; point.y *= zoom ;
 				
-				//	Scale the sprite and the map
-				sprite.scaleX = sprite.scaleY = zoom ;
 				
-				//	Scale the maps
-				for each ( var map:DisplayObject in maps ) {
-					if ( map is Map ) {
-//						( map as Map ).sprite.scaleX = zoom ;
-//						( map as Map ).sprite.scaleY = zoom ;
-					} else {
-						map.scaleX = map.scaleY = zoom ;
-					}
-				}
-				
-				//	Calculate the map offset
-				var dx:Number = ( Map.MAP_WINDOW_WIDTH/2 - point.x ) ;
-				var dy:Number = ( Map.MAP_WINDOW_HEIGHT/2 - point.y ) ;
+				//	Pan and zoom the map if scrolling is enabled
+				if ( scroll ) {
+					//	Modify this to get rid of map ripple	
+					zoom += ( scale - zoom ) * .0625 ;
 
-				//	Tween the map position 
-				sprite.x += ( dx - sprite.x ) * .125 ;
-				sprite.y += ( dy - sprite.y ) * .125 ;
-				
-				//	Keep the map from scrolling off the screen 
-				sprite.x = Math.min( Math.floor( sprite.x ), 0 ); 
-				sprite.y = Math.min( Math.floor( sprite.y ), 0 ); 
-				sprite.x = Math.max( sprite.x, Map.MAP_WINDOW_WIDTH - MAP_WIDTH * zoom );
-				sprite.y = Math.max( sprite.y, Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT * zoom );
-				
-				//	Copy the map pixels
-				copyPixels( sprite, sprite.x, sprite.y, zoom, zoom, 1 );
-				for each ( map in maps ) {
-					if ( map is Map ) {
-						copyPixels( ( map as Map ).sprite, sprite.x, sprite.y, sprite.scaleX, sprite.scaleY, sprite.alpha );
-//						( map as Map ).sprite.x = sprite.x ;
-//						( map as Map ).sprite.y = sprite.y ;
-					} else {
-						map.x = sprite.x ;
-						map.y = sprite.y ;
+					//	Scale the point
+					point.x *= zoom ; point.y *= zoom ;
+
+					var dx:Number = ( Map.MAP_WINDOW_WIDTH/2 - point.x ) ;
+					var dy:Number = ( Map.MAP_WINDOW_HEIGHT/2 - point.y ) ;
+	
+					//	Tween the map position 
+					position.x += ( dx - position.x ) * .125 ;
+					position.y += ( dy - position.y ) * .125 ;
+					
+					//	Keep the map from scrolling off the screen 
+					position.x = Math.min( Math.floor( position.x ), 0 ); 
+					position.y = Math.min( Math.floor( position.y ), 0 ); 
+					position.x = int( Math.max( position.x, Map.MAP_WINDOW_WIDTH - MAP_WIDTH * zoom ));
+					position.y = int( Math.max( position.y, Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT * zoom ));
+					
+					//	
+					for each ( sprite in sprites ) {
+						sprite.x = position.x ;
+						sprite.y = position.y ;
+						sprite.scaleX = sprite.scaleY = zoom ;
 					}
 				}
 				
-//				//	Draw the blur
-//				blur.bitmapData.fillRect( blur.bitmapData.rect, 0 );
-//				
-//				//	Create a matrix to translate to the part of the
-//				//	sprite image we're interested in
-//				//matrix.scale( zoom, zoom );
-//				matrix= new Matrix( );
-//				matrix.scale( zoom, zoom );
-//				matrix.tx = sprite.x ;
-//				matrix.ty = sprite.y ;
-//				
-//
-//				
-//				//	Create a color transform to turn it red
-//				blur.bitmapData.draw( sprite, matrix, xform );
 				
+				//	Move the map
+				for each ( var map:DisplayObject in maps ) {
+					map.x = position.x ;
+					map.y = position.y ;
+					map.scaleX = 
+					map.scaleY = zoom ;
+				}
 			}
 		}
 		
-		private function copyPixels( sprite:Sprite, x:Number, y:Number, scaleX:Number = 1, scaleY:Number = 1, alpha:Number = 1):void {
-			//	Draw the map to a bitmap instead of moving the sprite around
-			//	Draw the blur
-			blur.bitmapData.fillRect( blur.bitmapData.rect, 0 );
-
-			//	Create a matrix to translate to the part of the
-			//	sprite image we're interested in
-			var matrix:Matrix = new Matrix( );
-			matrix.scale( scaleX, scaleY );
-			matrix.tx = x ;
-			matrix.ty = y ;
-			
-			//	Create a color transform to turn it red
-			//	The alpha can also be adjusted here
-			var transform:ColorTransform = new ColorTransform( 1, 0, 0, 1 );
-			
-			//	Create a blur filter ( keep one around so we don't have to create it repeatedly )
-			blur.bitmapData.draw( sprite, matrix, transform,BlendMode.NORMAL, new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight ))	 ;
-			blur.bitmapData.applyFilter( blur.bitmapData, new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight ), new Point(), filter );
-
-			//	Create a color transform to adjust the alpha of the path being drawn
-			transform = new ColorTransform( 1, 1, 1, 1 );
-			blur.bitmapData.draw( sprite, matrix, transform, null, new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight ))	 ;
-			
-		}
-		private function overlay( overlays:Array, location:Point ):void {
+//			private function animate( event:Event ):void {
+//				
+//				
+//				glow.bitmapData.fillRect( glow.bitmapData.rect, 0 );					
+//				sprite.graphics.clear( );
+//				
+//				
+//				//var object:Object ;
+//				var j:int= 0 ;
+//				while ( j < index ) {
+//					draw( 1, paths[ j++ ] );
+//					//composite( paths[ j++ ] );
+//				}
+//				index = j ;
+//				if ( !marked( paths[ index ] )) {
+//					//	Draw by arc length
+//					var point:Point =  arc( paths[ index ] );
+//			
+//				
+//					if ( point ) {
+//						var dx:Number = ( stage.stageWidth/2 - point.x ) ;
+//						var dy:Number = ( stage.stageHeight/2 - point.y ) ;
+//		
+//						//	Tween the map position 
+//						position.x += ( dx - position.x ) * .125 ;
+//						position.y += ( dy - position.y ) * .125 ;
+//						
+//						//	Keep the map from scrolling off the screen 
+//						position.x = Math.min( Math.floor( position.x ), 0 ); 
+//						position.y = Math.min( Math.floor( position.y ), 0 ); 
+//						position.x = int( Math.max( position.x, stage.stageWidth - map.width ));
+//						position.y = int( Math.max( position.y, stage.stageHeight - map.height ));
+//						
+//						//	Copy the sprites
+//						composite( paths[ index ] );
+//						
+////						map.x = sprite.x = position.x ;
+////						map.y = sprite.y = position.y ;
+//						map.x = position.x ;
+//						map.y = position.y ;
+//					}
+//				}
+//			}
+		
+		private function overlay( overlays:Array, location:Point, sprite:Sprite ):void {
 			//	Kill the line style
 			sprite.graphics.lineStyle( );
 			
@@ -380,10 +381,24 @@ package com.madsystems.components.map
 			}			
 		}
 		
-		public function fade( alpha:Number ):void {
-			var tween:Tween = new Tween( {}, "", None.easeIn, sprite.alpha, alpha, 1, true ) ;
+		public function fade( alpha:Number, id:String ):void {
+			
+			var path:Path = ( function ( paths:Array ):Path {
+				for each ( var path:* in paths ) {
+					if ( path is Array ) 
+						return arguments.callee( path ) ;
+					if ( path is Path ) {
+						if (( path as Path ).id == id )
+							return path ;
+					}
+				}
+				return null ;
+			})( this.paths );
+				
+			//	Tween the propeprty	
+			var tween:Tween = new Tween( {}, "", None.easeIn, path.alpha, alpha, 1, true ) ;
 			var listener:Function = function ( event:TweenEvent ):void {
-				sprite.alpha = tween.position;
+				path.alpha = tween.position;
 				if ( event.type == TweenEvent.MOTION_FINISH ) {
 					( event.target as Tween ).removeEventListener
 						( TweenEvent.MOTION_CHANGE, arguments.callee );
