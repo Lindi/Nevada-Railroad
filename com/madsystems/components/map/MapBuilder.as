@@ -2,6 +2,7 @@
 {
 	import com.madsystems.components.Builder;
 	import com.madsystems.components.ComponentFactory;
+	import com.madsystems.components.Component ;
 	
 	internal class MapBuilder extends Builder
 	{
@@ -24,7 +25,7 @@
 			var map:Object ;
 							
 			if ( type == "mines" ) {
-				map = new Mines((( component.overlays as XMLList )[0] as XML ).copy());
+				map = new Mines((( component.overlays as XMLList )[0] as XML ).copy(), component.@reverse.toString( ), component.@autoPlay.toString( ));
 			} else {
 				//	Create the array of json files to be loaded by the map
 				var routes:Array = (function ( list:XMLList, array:Array ):Array {
@@ -37,9 +38,10 @@
 							var thickness:Number = Number( route.@thickness.toString() );
 							var arclength:Number = Number( route.@arclength.toString() );
 							var percent:Number = Number( route.@percent.toString( ));
+							var erase:Boolean = ( route.@erase.toString( ) == "true" ? true : false );
 							//trace( "id: " + route.@id.toString( ) + " percent: " + route.@percent.toString( ) );
 							var id:String = route.@id.toString( );
-							array.push( { url: url, color: color, thickness: thickness, id: id, arclength: arclength, percent: percent });
+							array.push( { url: url, color: color, thickness: thickness, id: id, arclength: arclength, percent: percent, erase: erase });
 						}
 					}
 					return array ;
@@ -58,6 +60,7 @@
 				var speed:Number = Number( component.@speed.toString( ));
 				var scroll:Boolean = ( component.@scroll ? ( component.@scroll.toString( ) == "true" ? true : false ) : false ) ;
 				var autoStart:Boolean = ( ( component.attribute("autoStart") as XMLList ).length() ? ( component.@autoStart.toString( ) == "true" ? true : false ) : true ) ;
+				var autoStop:Boolean = ( ( component.attribute("autoStop") as XMLList ).length() ? ( component.@autoStop.toString( ) == "false" ? false : true ) : true ) ;
 
 
 				//	Create the map overlays
@@ -77,10 +80,11 @@
 					overlays.push( object );
 				}
 				if ( overlays.length )
-					map = new Map( routes, maps, width, height, scroll, overlays, autoStart );
-				else map = new Map( routes, maps, width, height, scroll, null, autoStart );
+					map = new Map( routes, maps, width, height, scroll, overlays, autoStart, autoStop );
+				else map = new Map( routes, maps, width, height, scroll, null, autoStart, autoStop );
 
 			}
+			( map as Component ).id = component.@id.toString( );
 			components[ component.@id ] = map ;
 			return map ;
 		}

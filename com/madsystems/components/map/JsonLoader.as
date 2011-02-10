@@ -32,8 +32,10 @@ package com.madsystems.components.map
 		loader.addEventListener( Event.COMPLETE,
 			function ( event:Event ):void
 			{  
+				//trace( event ) ;
 				//	Build the paths
 				var json:String = ( loader.data as String );
+				//trace( json ) ;
 				var object:Object = JSON.decode( json )  ;
 				for each ( var e:Object in object ) {
 					paths.push( e );					
@@ -47,7 +49,7 @@ package com.madsystems.components.map
 		//	Silently handle errant files
 		loader.addEventListener( IOErrorEvent.IO_ERROR,
 			function ( event:IOErrorEvent ):void {
-				trace( event ) ;
+				//trace( event ) ;
 				( event.target as URLLoader ).removeEventListener
 					( IOErrorEvent.IO_ERROR, arguments.callee );
 			});

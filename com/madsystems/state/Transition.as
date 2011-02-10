@@ -1,6 +1,6 @@
 package com.madsystems.state
 {
-	public class Transition
+	public class Transition implements ITransition
 	{
 		public var target:Object ;
 		public var name:String ;

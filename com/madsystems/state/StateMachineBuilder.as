@@ -8,6 +8,8 @@
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.utils.getDefinitionByName;
+	import com.madsystems.state.effects.Fade ;
+	
 	//import flash.filesystem.* ;
 	
 	public class StateMachineBuilder extends EventDispatcher
@@ -143,7 +145,9 @@
 						}
 						
 						//	Push the transition object into the input's transition array
-						object.transitions.push( new Transition( target, name, args ));
+						if ( transition.@type == "fade" )
+							object.transitions.push( new Fade( target, name, args, transition.@fade.toString( ) ));
+						else object.transitions.push( new Transition( target, name, args ));
 					}
 				}
 

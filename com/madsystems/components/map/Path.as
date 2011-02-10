@@ -15,7 +15,7 @@
 		private var index:int = 0 ;
 		
 		//	The length that was drawn on the last curve
-		private var length:Number ;
+		internal var length:Number ;
 		
 		//	The arc length
 		private var s:Number ; 
@@ -30,6 +30,7 @@
 		internal var rectangle:Rectangle = new Rectangle( );
 		internal var alpha:Number = 1 ;
 		private var sprites:Array ;
+		internal var erase:Boolean = false ;
 		
 		public function Path( paths:Array, sprites:Array, properties:Object )
 		{
@@ -39,9 +40,9 @@
 			this.location = new Point( );
 			this.length = this.s = ( properties.arclength ? properties.arclength : 5 ) ;
 			this.thickness = ( properties.hasOwnProperty( "thickness" ) ? int( properties.thickness ) : 1 ) ;
-			this.percent = ( !isNaN( properties.percent ) ? properties.percent : 0 );
-			//trace( "percent: " + percent );
-//			this.index = int( paths.length * percent );
+			this.percent = properties.percent ; //( !isNaN( properties.percent ) ? properties.percent : 0 );
+			this.erase = ( properties.hasOwnProperty("erase") ? properties.erase : false );
+			reset( );
 			this.color = ( properties.hasOwnProperty( "color" ) ? Number( properties.color ) : 0xffffff ) ;
 		}
 		
@@ -55,15 +56,24 @@
 		}
 		
 		public function marked( ):Boolean {
+			if ( erase )
+				return ( index < 0 );
 			return ( index >= paths.length );
 		}
 		
 		public function reset( ):void {
-			index = int( paths.length * percent ) ;
+			if ( erase ) {
+				index = paths.length - 1 ;
+			} else if ( !isNaN( percent )) {
+				index = int( paths.length * percent ) ;
+			} else index = 0 ;
 		}
 		
 		public function arc(  ):Point  
 		{	
+			if ( erase )
+				return unwind( );
+				
 			//	Draw what's been drawn already
 			var j:int= 0 ;
 			while ( j < index )
@@ -78,6 +88,33 @@
 						length -= paths[ j++ ].length ;
 					}
 				} while ( j < paths.length && length > paths[ j ].length  )
+			}
+			if ( length < s )
+				length += ( s - length );
+			else length += s ;
+			index = j ;
+			return location ;
+			
+		}
+		
+		private function unwind( ):Point 
+		{
+			//	Draw what's been drawn already
+			if ( index < 0 )
+				return location ;
+			var j:int= 0 ;
+			while ( j < index )
+				mark( paths[ j++ ], 1 );
+				
+			if ( j > -1 ) {
+				//do {
+					var ds:Number = Math.max( paths[ j ].length - length, 0 );
+					var t:Number = ds / paths[ j ].length ;
+					location = mark( paths[ j ], t ) ;
+					if ( ds == 0 )
+						length -= paths[ j-- ].length ;
+					//else length += s ;
+				//} while ( j > -1 && length < paths[ j ].length  )
 			}
 			if ( length < s )
 				length += ( s - length );
@@ -158,7 +195,7 @@
 			var c:Object = curve[ 2] as Object ;
 			var p:Point = new Point( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t );
 			var q:Point = new Point( p.x + ( c.x - p.x ) * t, p.y + ( c.y - p.y ) * t );
-			graphics.lineStyle( thickness, color, alpha, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
+			graphics.lineStyle( thickness, color, alpha );//, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
 			graphics.moveTo( a.x, a.y );
 			graphics.curveTo( p.x, p.y, q.x, q.y );
 			var r:Point = new Point( );

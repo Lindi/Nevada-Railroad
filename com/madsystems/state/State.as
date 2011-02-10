@@ -6,12 +6,13 @@
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
+	import flash.events.IEventDispatcher ;
+	import com.madsystems.state.ITransition ;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
-	//import mx.core.UIComponent;
-	import flash.display.Sprite;;
+	import mx.core.UIComponent;
+	//import flash.display.Sprite;;
 	
 	public class State extends EventDispatcher implements IState
 	{
@@ -20,8 +21,8 @@
 		public var components:Array ;
 		internal var inputs:Object ;
 		public var id:String ;
-//		public var uicomponent:UIComponent ;
-		public var uicomponent:Sprite ;
+		public var uicomponent:UIComponent ;
+//		public var uicomponent:Sprite ;
 		public var nevada:DisplayObjectContainer ;
 		internal var transitions:Array ;
 		internal var timer:Timer ;
@@ -30,8 +31,8 @@
 		{
 			super( );
 			this.nevada = nevada ;
-//			uicomponent = new UIComponent( );
-			uicomponent = new Sprite( );
+			uicomponent = new UIComponent( );
+//			uicomponent = new Sprite( );
 			components = new Array( );
 			inputs = new Object( );
 			if ( timeout ) {
@@ -55,7 +56,7 @@
 				var component:Object = components[ i ] ;
 				if ( component is DisplayObject )
 					show(( component as DisplayObject ), uicomponent, j++ );
-				for each ( var transition:Transition in transitions )
+				for each ( var transition:ITransition in transitions )
 					transition.execute();
 				if ( component is IEventDispatcher )
 					( component as IEventDispatcher ).dispatchEvent( new StateEvent( StateEvent.RUN ));
@@ -85,7 +86,7 @@
 				if ( event.type == StateEvent.TIMEOUT ) {
 					//	Go through each transition and execute it
 					if ( input[ 0].transitions ) {
-						for each ( var transition:Transition in input[ 0 ].transitions )
+						for each ( var transition:ITransition in input[ 0 ].transitions )
 							transition.execute();
 					}
 					next = input[ 0].next ;

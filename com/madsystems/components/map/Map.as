@@ -18,7 +18,9 @@
 	import flash.geom.Point;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
-	import flash.geom.Rectangle ;
+	import flash.geom.Rectangle 
+	import flash.utils.Timer;
+	import flash.events.TimerEvent ;
 
 			
 	internal class Map extends Component
@@ -29,7 +31,7 @@
 		//internal var sprite:Sprite ;
 		private var zoom:Number ;
 		private var scroll:Boolean ;
-		private var filter:BlurFilter = new BlurFilter( 10, 10, 1 );
+		private var filter:BlurFilter = new BlurFilter( 12, 12, 1 );
 		private var matrix:Matrix = new Matrix( );
 			
 		//	The target zoom
@@ -38,13 +40,15 @@
 		private var autoStart:Boolean ;
 		private var position:Point = new Point( );
 		private var sprites:Array ;
+		private var autoStop:Boolean ;
+		private var timer:Timer = new Timer( 20 );
 		
 		internal static const MAP_WINDOW_WIDTH:int = 1920 ;
 		internal static const MAP_WINDOW_HEIGHT:int = 1080 ;
 		private var MAP_WIDTH:int ;
 		private var MAP_HEIGHT:int ;
 		
-		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:Array = null, autoStart:Boolean = true )
+		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:Array = null, autoStart:Boolean = true, autoStop:Boolean = true )
 		{
 			super( );
 			MAP_WIDTH = width ;
@@ -55,6 +59,7 @@
 			this.overlays = overlays ;
 			this.scroll = scroll ;
 			this.autoStart = autoStart ;
+			this.autoStop = autoStop ;
 			
 			//	Listen for state events
 			addEventListener( StateEvent.RUN, run ) ;
@@ -65,10 +70,10 @@
 			//	Do we need to add this sprite to the display list
 			//	if we're rendering it to a bitmap
 			sprites = new Array( );
-			var sprite:Sprite = addChild( new Sprite( )) as Sprite ;
-			sprite.filters = [ filter ] ;
-			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
-			sprites.push( sprite ) ;
+//			var sprite:Sprite = addChild( new Sprite( )) as Sprite ;
+//			sprite.filters = [ filter ] ;
+//			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
+//			sprites.push( sprite ) ;
 			sprites.push( addChild( new Sprite( )));
 			
 			//	Keep track of the number of loaders
@@ -105,6 +110,9 @@
 				}
 		 		return array ; 
 			})( files, [] );			
+			
+			//	Listen for the timer
+			timer.addEventListener( TimerEvent.TIMER, frame );
 		}
 		
 		private function init( json:Array ):void {
@@ -123,10 +131,14 @@
 							thickness: element.thickness,
 							arclength: element.arclength,
 							percent: element.percent,
+							erase: element.erase,
 							id: element.id
 						};
-						for each ( var path:Array in element.paths ) 
+						for each ( var path:Array in element.paths ) {
+							if ( !path.length )
+								continue ;
 							array.push( new Path( path, sprites, properties ));
+						}
 					}
 				}
 				return array ;
@@ -152,13 +164,45 @@
 						else ( path as Path ).reset() ;					
 					}
 				})( paths );
-				
-				//	Reset the alpha for maps which we've faded
-				alpha = 1 ;
+				visible = true ;
 			}
 			
 		}
 		
+		public function predraw( ):void {
+			for each ( var sprite:Sprite in sprites )
+				sprite.graphics.clear();
+			var object:Object ;
+			var j:int= 0 ;
+			while ( j < index ) 
+				draw( 1, paths[ j++ ] );
+			
+		}
+		public function unwind( ):void {
+			
+			//	Reset the paths
+			//	This should be conditional
+			var p:Array = [];
+			p.push
+			(
+				(function ( paths:Array, bin:Array ):Array {
+					while ( paths.length ) {
+						var path:* = paths.pop();
+						if ( path is Array ) {
+							return arguments.callee( path, bin );
+						} else {
+							bin.unshift( path );
+							//( path as Path ).length = 3 ;
+							( path as Path ).erase = true ;
+							( path as Path ).reset() ;
+						}					
+					}
+					return bin ;
+				})( this.paths, [] )
+			)
+			this.paths = p ;
+			index = 0 ;
+		}
 		override public function run( event:Event ):void {
 			trace("run("+event+")");
 			if ( autoStart )
@@ -166,27 +210,40 @@
 		}
 		
 		public function play( ):void {
-			if ( !hasEventListener( Event.ENTER_FRAME ))
-				addEventListener( Event.ENTER_FRAME, frame );
-			//	Start the map
-			start( paths[ index ] );	
+			trace("play("+id+")");
+			timer.start() ;
+			start( paths[ index ] );				
+//			if ( !hasEventListener( Event.ENTER_FRAME )) {
+//				addEventListener( Event.ENTER_FRAME, frame );
+//				//	Start the map
+//				start( paths[ index ] );	
+//			}
 		}
 		
 		
 		override public function next( event:Event ):void {
-			removeEventListener( Event.ENTER_FRAME, frame );
+			if ( autoStop ) {
+				stop( );	
+			}
+			
+		}
+		
+		public function stop( ):void {
+			trace("stop("+id+","+autoStop+")");
+//			if ( hasEventListener( Event.ENTER_FRAME ))
+//				removeEventListener( Event.ENTER_FRAME, frame );
+			timer.stop( );
 		}
 		
 		private function frame( event:Event ):void {
 			if ( marked( paths[ index ])) {
 				dispatchEvent( new Event( Event.COMPLETE ));
+				timer.stop();
 				return ;
 			}
 				
-			//glow.bitmapData.fillRect( glow.bitmapData.rect, 0 );					
 			for each ( var sprite:Sprite in sprites )
 				sprite.graphics.clear();
-				
 			var object:Object ;
 			var j:int= 0 ;
 			while ( j < index ) 
@@ -194,15 +251,11 @@
 				
 			//	Draw by arc length
 			var point:Point =  arc( paths[ index ] );
-			
-				
 			if ( point ) {
 				
 				//	Draw the overlays
 				if ( overlays )
 					overlay( overlays, point, sprites[ sprites.length - 1] as Sprite ) ;
-				
-				
 				
 				//	Pan and zoom the map if scrolling is enabled
 				if ( scroll ) {
@@ -225,70 +278,28 @@
 					position.x = int( Math.max( position.x, Map.MAP_WINDOW_WIDTH - MAP_WIDTH * zoom ));
 					position.y = int( Math.max( position.y, Map.MAP_WINDOW_HEIGHT - MAP_HEIGHT * zoom ));
 					
-					//	
+					//	Move the sprites
 					for each ( sprite in sprites ) {
 						sprite.x = position.x ;
 						sprite.y = position.y ;
 						sprite.scaleX = sprite.scaleY = zoom ;
 					}
-				}
-				
-				
-				//	Move the map
-				for each ( var map:DisplayObject in maps ) {
-					map.x = position.x ;
-					map.y = position.y ;
-					map.scaleX = 
-					map.scaleY = zoom ;
+
+					//	Move the map
+					for each ( var map:DisplayObject in maps ) {
+						map.x = position.x ;
+						map.y = position.y ;
+						map.scaleX = 
+						map.scaleY = zoom ;
+					}
 				}
 			}
 		}
 		
-//			private function animate( event:Event ):void {
-//				
-//				
-//				glow.bitmapData.fillRect( glow.bitmapData.rect, 0 );					
-//				sprite.graphics.clear( );
-//				
-//				
-//				//var object:Object ;
-//				var j:int= 0 ;
-//				while ( j < index ) {
-//					draw( 1, paths[ j++ ] );
-//					//composite( paths[ j++ ] );
-//				}
-//				index = j ;
-//				if ( !marked( paths[ index ] )) {
-//					//	Draw by arc length
-//					var point:Point =  arc( paths[ index ] );
-//			
-//				
-//					if ( point ) {
-//						var dx:Number = ( stage.stageWidth/2 - point.x ) ;
-//						var dy:Number = ( stage.stageHeight/2 - point.y ) ;
-//		
-//						//	Tween the map position 
-//						position.x += ( dx - position.x ) * .125 ;
-//						position.y += ( dy - position.y ) * .125 ;
-//						
-//						//	Keep the map from scrolling off the screen 
-//						position.x = Math.min( Math.floor( position.x ), 0 ); 
-//						position.y = Math.min( Math.floor( position.y ), 0 ); 
-//						position.x = int( Math.max( position.x, stage.stageWidth - map.width ));
-//						position.y = int( Math.max( position.y, stage.stageHeight - map.height ));
-//						
-//						//	Copy the sprites
-//						composite( paths[ index ] );
-//						
-////						map.x = sprite.x = position.x ;
-////						map.y = sprite.y = position.y ;
-//						map.x = position.x ;
-//						map.y = position.y ;
-//					}
-//				}
-//			}
+		
 		
 		private function overlay( overlays:Array, location:Point, sprite:Sprite ):void {
+			
 			//	Kill the line style
 			sprite.graphics.lineStyle( );
 			
