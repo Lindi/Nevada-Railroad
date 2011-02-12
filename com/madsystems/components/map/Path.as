@@ -195,7 +195,7 @@
 			var c:Object = curve[ 2] as Object ;
 			var p:Point = new Point( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t );
 			var q:Point = new Point( p.x + ( c.x - p.x ) * t, p.y + ( c.y - p.y ) * t );
-			graphics.lineStyle( thickness, color, alpha );//, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
+			graphics.lineStyle( thickness, color, alpha, false, "normal", CapsStyle.NONE, JointStyle.ROUND );
 			graphics.moveTo( a.x, a.y );
 			graphics.curveTo( p.x, p.y, q.x, q.y );
 			var r:Point = new Point( );

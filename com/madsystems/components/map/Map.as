@@ -7,20 +7,14 @@
 	import fl.transitions.TweenEvent;
 	import fl.transitions.easing.None;
 	
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
-	import flash.display.BlendMode ;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.filters.BlurFilter;
-	import flash.geom.Point;
-	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
-	import flash.geom.Rectangle 
+	import flash.geom.Point;
 	import flash.utils.Timer;
-	import flash.events.TimerEvent ;
 
 			
 	internal class Map extends Component
@@ -36,7 +30,7 @@
 			
 		//	The target zoom
 		private var scale:Number ;
-		private var overlays:Array ;
+		private var overlays:IOverlays  ;
 		private var autoStart:Boolean ;
 		private var position:Point = new Point( );
 		private var sprites:Array ;
@@ -48,7 +42,7 @@
 		private var MAP_WIDTH:int ;
 		private var MAP_HEIGHT:int ;
 		
-		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:Array = null, autoStart:Boolean = true, autoStop:Boolean = true )
+		public function Map( files:Array, maps:Array, width:Number, height:Number, scroll:Boolean = true, overlays:IOverlays = null, autoStart:Boolean = true, autoStop:Boolean = true )
 		{
 			super( );
 			MAP_WIDTH = width ;
@@ -66,21 +60,47 @@
 			addEventListener( StateEvent.NEXT, next );
 			
 			
+			//	Center things if we're not scrolling them
+			var x:Number = ( Map.MAP_WINDOW_WIDTH - width )/2 ;
+			var y:Number = ( Map.MAP_WINDOW_HEIGHT - height)/2 ;
+			
+			//trace( "width " + width + " x " + x + " height " + height + " y " + y ) ;
+			
 			//	The paths will draw on this 
 			//	Do we need to add this sprite to the display list
 			//	if we're rendering it to a bitmap
 			sprites = new Array( );
-//			var sprite:Sprite = addChild( new Sprite( )) as Sprite ;
+			var sprite:Sprite ;
+//			sprite = addChild( new Sprite( )) as Sprite ;
+//			if ( !scroll ) {
+//				sprite.x = x ;
+//				sprite.y = y ;
+//			}
 //			sprite.filters = [ filter ] ;
 //			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
 //			sprites.push( sprite ) ;
-			sprites.push( addChild( new Sprite( )));
+			sprite = new Sprite( );
+			if ( !scroll ) {
+				sprite.x = x ;
+				sprite.y = y ;
+			}
+			sprites.push( addChild( sprite ));
+			
+			//	Center the maps if we're not scrolling
+			for each ( var map:DisplayObject in maps ) {
+				map.x = x ; map.y = y ;
+			}
+			
+			//	Add the overlays on top
+			if ( overlays is DisplayObject )
+				addChild( overlays as DisplayObject );
 			
 			//	Keep track of the number of loaders
 			var loaders:int ;
 			
 			//	Keep track of the loaded json
 			var json:Array = new Array( );
+			
 			
 			//	Create a listener that decrements the counter
 			//	when each loader has completed work
@@ -112,7 +132,7 @@
 			})( files, [] );			
 			
 			//	Listen for the timer
-			timer.addEventListener( TimerEvent.TIMER, frame );
+			//timer.addEventListener( TimerEvent.TIMER, frame );
 		}
 		
 		private function init( json:Array ):void {
@@ -178,46 +198,45 @@
 				draw( 1, paths[ j++ ] );
 			
 		}
-		public function unwind( ):void {
-			
-			//	Reset the paths
-			//	This should be conditional
-			var p:Array = [];
-			p.push
-			(
-				(function ( paths:Array, bin:Array ):Array {
-					while ( paths.length ) {
-						var path:* = paths.pop();
-						if ( path is Array ) {
-							return arguments.callee( path, bin );
-						} else {
-							bin.unshift( path );
-							//( path as Path ).length = 3 ;
-							( path as Path ).erase = true ;
-							( path as Path ).reset() ;
-						}					
-					}
-					return bin ;
-				})( this.paths, [] )
-			)
-			this.paths = p ;
-			index = 0 ;
-		}
+//		public function unwind( ):void {
+//			
+//			//	Reset the paths
+//			//	This should be conditional
+//			var p:Array = [];
+//			p.push
+//			(
+//				(function ( paths:Array, bin:Array ):Array {
+//					while ( paths.length ) {
+//						var path:* = paths.pop();
+//						if ( path is Array ) {
+//							return arguments.callee( path, bin );
+//						} else {
+//							bin.unshift( path );
+//							//( path as Path ).length = 3 ;
+//							( path as Path ).erase = true ;
+//							( path as Path ).reset() ;
+//						}					
+//					}
+//					return bin ;
+//				})( this.paths, [] )
+//			)
+//			this.paths = p ;
+//			index = 0 ;
+//		}
 		override public function run( event:Event ):void {
 			trace("run("+event+")");
 			if ( autoStart )
-				play( );
+				play( event );
 		}
 		
-		public function play( ):void {
+		public function play( event:Event = null ):void {
 			trace("play("+id+")");
-			timer.start() ;
-			start( paths[ index ] );				
-//			if ( !hasEventListener( Event.ENTER_FRAME )) {
-//				addEventListener( Event.ENTER_FRAME, frame );
-//				//	Start the map
-//				start( paths[ index ] );	
-//			}
+			//timer.start() ;
+			start( paths[ index ] );
+			if ( overlays && event )
+				( overlays as Component ).run( event );	
+			if ( !hasEventListener( Event.ENTER_FRAME )) 
+				addEventListener( Event.ENTER_FRAME, frame );
 		}
 		
 		
@@ -228,17 +247,19 @@
 			
 		}
 		
-		public function stop( ):void {
+		public function stop( event:Event = null ):void {
 			trace("stop("+id+","+autoStop+")");
-//			if ( hasEventListener( Event.ENTER_FRAME ))
-//				removeEventListener( Event.ENTER_FRAME, frame );
-			timer.stop( );
+			if ( overlays && event )
+				( overlays as Component ).next( event );	
+			if ( hasEventListener( Event.ENTER_FRAME ))
+				removeEventListener( Event.ENTER_FRAME, frame );
+			//timer.stop( );
 		}
 		
 		private function frame( event:Event ):void {
 			if ( marked( paths[ index ])) {
 				dispatchEvent( new Event( Event.COMPLETE ));
-				timer.stop();
+				removeEventListener( Event.ENTER_FRAME, frame );
 				return ;
 			}
 				
@@ -253,14 +274,12 @@
 			var point:Point =  arc( paths[ index ] );
 			if ( point ) {
 				
-				//	Draw the overlays
-				if ( overlays )
-					overlay( overlays, point, sprites[ sprites.length - 1] as Sprite ) ;
 				
 				//	Pan and zoom the map if scrolling is enabled
 				if ( scroll ) {
 					//	Modify this to get rid of map ripple	
 					zoom += ( scale - zoom ) * .0625 ;
+
 
 					//	Scale the point
 					point.x *= zoom ; point.y *= zoom ;
@@ -292,45 +311,48 @@
 						map.scaleX = 
 						map.scaleY = zoom ;
 					}
-				}
+					//	Draw the overlays
+						if ( overlays )
+							overlays.overlay( zoom, position ) ;//overlays, point, sprites[ sprites.length - 1] as Sprite ) ;
+					}
 			}
 		}
 		
 		
 		
-		private function overlay( overlays:Array, location:Point, sprite:Sprite ):void {
-			
-			//	Kill the line style
-			sprite.graphics.lineStyle( );
-			
-			//	Go through each overlay
-			//	If the current zoom is greater than 
-			//	or equal to the current zoom threshold
-			//	and the current location is close enough
-			//	the location point, display it
-			//	Hide each currently visible overlay
-			//	that doesn't meet those conditions
-			for ( var i:int = 0; i < overlays.length; i++ ) {
-				var overlay:Object = overlays[ i];
-				var x0:Number = overlay.x - overlays[0].x ;
-				var y0:Number = overlay.y - overlays[0].y ;
-				var dx:Number = location.x - overlays[0].x ;
-				var dy:Number = location.y - overlays[0].y ;
-				var show:Boolean = ( zoom >= overlay.zoom ) ;
-				show = show &&  (( dx * dx + dy * dy ) > ( x0 * x0 + y0 * y0 )); 
-				overlay.alpha += ( Number( show ) - overlay.alpha ) * .5 ;
-				( overlay.image.bitmap as DisplayObject ).alpha = overlay.alpha ;
-				( overlay.image.bitmap as DisplayObject ).x = overlay.image.x ; // * zoom ;
-				( overlay.image.bitmap as DisplayObject ).y = overlay.y - ( overlay.image.bitmap as DisplayObject ).height/2 ; //overlay.image.y ; // * zoom ;
-				sprite.graphics.beginFill( overlay.color, overlay.alpha ) ;
-				sprite.graphics.drawCircle( overlay.x, overlay.y, 5 );
-				sprite.graphics.endFill( );
-				if ( show && !sprite.contains( overlay.image.bitmap as DisplayObject ))
-					sprite.addChild( overlay.image.bitmap as DisplayObject );
-				else if ( !show && sprite.contains( overlay.image.bitmap as DisplayObject ))
-					sprite.removeChild( overlay.image.bitmap  as DisplayObject );
-			}
-		}
+//		private function overlay( overlays:Array, location:Point, sprite:Sprite ):void {
+//			
+//			//	Kill the line style
+//			sprite.graphics.lineStyle( );
+//			
+//			//	Go through each overlay
+//			//	If the current zoom is greater than 
+//			//	or equal to the current zoom threshold
+//			//	and the current location is close enough
+//			//	the location point, display it
+//			//	Hide each currently visible overlay
+//			//	that doesn't meet those conditions
+//			for ( var i:int = 0; i < overlays.length; i++ ) {
+//				var overlay:Object = overlays[ i];
+//				var x0:Number = overlay.x - overlays[0].x ;
+//				var y0:Number = overlay.y - overlays[0].y ;
+//				var dx:Number = location.x - overlays[0].x ;
+//				var dy:Number = location.y - overlays[0].y ;
+//				var show:Boolean = ( zoom >= overlay.zoom ) ;
+//				show = show &&  (( dx * dx + dy * dy ) > ( x0 * x0 + y0 * y0 )); 
+//				overlay.alpha += ( Number( show ) - overlay.alpha ) * .5 ;
+//				( overlay.image.bitmap as DisplayObject ).alpha = overlay.alpha ;
+//				( overlay.image.bitmap as DisplayObject ).x = overlay.image.x ; // * zoom ;
+//				( overlay.image.bitmap as DisplayObject ).y = overlay.y - ( overlay.image.bitmap as DisplayObject ).height/2 ; //overlay.image.y ; // * zoom ;
+//				sprite.graphics.beginFill( overlay.color, overlay.alpha ) ;
+//				sprite.graphics.drawCircle( overlay.x, overlay.y, 5 );
+//				sprite.graphics.endFill( );
+//				if ( show && !sprite.contains( overlay.image.bitmap as DisplayObject ))
+//					sprite.addChild( overlay.image.bitmap as DisplayObject );
+//				else if ( !show && sprite.contains( overlay.image.bitmap as DisplayObject ))
+//					sprite.removeChild( overlay.image.bitmap  as DisplayObject );
+//			}
+//		}
 		
 		private function arc( object:* ):Point {
 			var point:Point ;

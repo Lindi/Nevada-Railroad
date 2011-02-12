@@ -1,9 +1,9 @@
 package com.madsystems.components
 {
-	import flash.events.Event 
 	import flash.display.Sprite;
+	import flash.events.Event;
 
-	public class Component extends Sprite
+	public class Component extends Sprite implements IComponent
 	{	
 		public var id:String ;
 			

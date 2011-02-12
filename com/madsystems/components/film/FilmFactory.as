@@ -12,7 +12,7 @@ package com.madsystems.components.film
 			if ( !builder )
 				builder = new FilmBuilder( );
 			var id:String = component.@id.toString();
-			var object:Object = builder.create( { container: Nevada, id: id } );
+			var object:Object = builder.create( { container: main, id: id } );
 			if ( object )
 				return object ;
 			return builder.build( component ) ;

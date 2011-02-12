@@ -2,28 +2,27 @@
 	<states>
 		<state id="attract-loop" initialState="yes">
 			<inputs>
-				<input type="mouseUp" target="attract-loop" next="map-nevada-rails" />
+				<input type="mouseUp" target="attract-loop" next="screen-20-map-nevada-rails" />
 			</inputs>
 		</state>
-<!--
 		<state id="title" timeout="5000">
 			<inputs>
-				<input type="timeout" next="intro-1" />
+				<input type="timeout" next="screen-4" />
 			</inputs>
 		</state>
-		<state id="intro-1">
+		<state id="screen-4">
 			<inputs>
-				<input type="soundComplete" target="sound-screen-04" next="intro-2" />
+				<input type="soundComplete" target="sound-screen-04" next="screen-5" />
 			</inputs>
 		</state>
-		<state id="intro-2">
+		<state id="screen-5">
 			<inputs>
-				<input type="soundComplete" target="sound-screen-05" next="map-south-end" />
+				<input type="soundComplete" target="sound-screen-05" next="screen-6-map-south-end" />
 			</inputs>
 		</state>
-		<state id="map-south-end">
+		<state id="screen-6-map-south-end">
 			<inputs>
-				<input type="soundComplete" target="sound-screen-06" next="map-north-end">
+				<input type="soundComplete" target="sound-screen-06" next="screen-7-map-north-end">
 					<transitions>
 						<transition name="reset" target="map-south-end">
 							<argument type="Boolean" value="true" />
@@ -32,12 +31,12 @@
 				</input>
 			</inputs>
 		</state>
-		<state id="map-north-end">
+		<state id="screen-7-map-north-end">
 			<inputs>
-				<input type="complete" target="map-north-end" next="map-comparison" />
+				<input type="complete" target="map-north-end" next="screen-8-map-comparison" />
 			</inputs>
 		</state>
-		<state id="map-comparison">
+		<state id="screen-8-map-comparison">
 			<transitions>
 				<transition name="reset" target="map-comparison">
 					<argument type="Boolean" value="true" />
@@ -48,7 +47,7 @@
 				</transition>
 			</transitions>
 			<inputs>
-				<input type="complete" target="map-comparison" next="comstock">
+				<input type="complete" target="map-comparison" next="screen-9-comstock">
 					<transitions>
 						<transition name="reset" target="map-comparison">
 							<argument type="Boolean" value="true" />
@@ -57,7 +56,7 @@
 				</input>
 			</inputs>
 		</state>
-		<state id="comstock">
+		<state id="screen-9-comstock">
 			<inputs>
 				<input type="soundComplete" target="sound-screen-09" next="screen-10" />
 			</inputs>
@@ -65,25 +64,25 @@
 		<state id="screen-10" timeout="200000">
 			<inputs>
 				<input type="timeout" next="attract-loop" />
-				<input type="mouseUp" target="screen-10-historical-images" next="screen-10-historical-images"  />
+				<input type="mouseUp" target="screen-10-view-images" next="screen-11"  />
 				<input type="mouseUp" target="screen-10-resume-story" next="screen-13" />
 			</inputs>
 		</state>
-		<state id="screen-10-historical-images" timeout="200000">
+		<state id="screen-11" timeout="200000">
 			<inputs>
 				<input type="timeout" next="attract-loop" />
-				<input type="mouseUp" target="screen-10-gallery-resume-story" next="screen-13" />
+				<input type="mouseUp" target="screen-11-resume-story" next="screen-13" />
 			</inputs>
 		</state>
 		<state id="screen-13" timeout="200000">
 			<inputs>
 				<input type="timeout" next="attract-loop" />
-				<input type="mouseUp" target="screen-13" next="map-pacific-1" />
+				<input type="mouseUp" target="screen-13-touch-here" next="screen-14-map-pacific" />
 			</inputs>
 		</state>
-		<state id="map-pacific-1">
+		<state id="screen-14-map-pacific">
 			<inputs>
-				<input type="soundComplete" target="sound-screen-14" next="map-pacific-2">
+				<input type="soundComplete" target="sound-screen-14" next="screen-15-map-pacific">
 					<transitions>
 						<transition name="track" target="map-pacific">
 							<argument type="String" value="union" />
@@ -96,9 +95,9 @@
 				</input>
 			</inputs>
 		</state>
-		<state id="map-pacific-2">
+		<state id="screen-15-map-pacific">
 			<inputs>
-				<input type="soundComplete" target="sound-screen-15" next="map-pacific-3">
+				<input type="soundComplete" target="sound-screen-15" next="screen-16-map-pacific">
 					<transitions>
 						<transition name="track" target="map-pacific">
 							<argument type="String" value="union" />
@@ -111,7 +110,7 @@
 				</input>
 			</inputs>
 		</state>
-		<state id="map-pacific-3">
+		<state id="screen-16-map-pacific">
 			<inputs>
 				<input type="soundComplete" target="sound-screen-16" next="screen-17">
 					<transitions>
@@ -125,11 +124,11 @@
 		<state id="screen-17" timeout="200000">
 			<inputs>
 				<input type="timeout" next="attract-loop" />
-				<input type="mouseUp" target="screen-17-historical-images" next="screen-17-historical-images"  />
+				<input type="mouseUp" target="screen-17-view-images" next="screen-17-gallery"  />
 				<input type="mouseUp" target="screen-17-resume-story" next="screen-18" />
 			</inputs>
 		</state>
-		<state id="screen-17-historical-images" timeout="200000">
+		<state id="screen-17-gallery" timeout="200000">
 			<inputs>
 				<input type="timeout" next="attract-loop" />
 				<input type="mouseUp" target="screen-17-gallery-resume-story" next="screen-18" />
@@ -148,12 +147,11 @@
 		<state id="screen-19-buttons" timeout="200000">
 			<inputs>
 				<input type="timeout" next="attract-loop" />
-				<input type="mouseUp" target="screen-19-map-nevada-mines" next="screen-20-map-nevada-mines"  />
-				<input type="mouseUp" target="screen-19-map-nevada-rails" next="screen-21-map-nevada-rails" />
+				<input type="mouseUp" target="screen-19-view-map" next="screen-20-map-nevada-rails"  />
+				<input type="mouseUp" target="screen-19-resume-story" next="screen-22" />
 			</inputs>
 		</state>
--->
-		<state id="map-nevada-rails">
+		<state id="screen-20-map-nevada-rails">
 			<inputs>
 				<input type="complete" target="map-nevada-rails-reverse" next="screen-22">
 					<transitions>
@@ -182,14 +180,14 @@
 						<transition type="fade" fade="out" target="map-nevada-mines" />
 					</transitions>
 				</input>
-				<input type="mouseUp" target="screen-21-resume-story" next="screen-22">
+				<input type="mouseUp" target="screen-20-resume-story" next="screen-22">
 					<transitions>
 						<transition name="reset" target="map-nevada-rails">
 							<argument type="Boolean" value="true" />
 						</transition>
 					</transitions>
 				</input>
-				<input type="mouseUp" target="screen-21-view-map" next="screen-19-buttons">
+				<input type="mouseUp" target="screen-20-back" next="screen-19-buttons">
 					<transitions>
 						<transition name="reset" target="map-nevada-rails">
 							<argument type="Boolean" value="true" />
@@ -201,7 +199,6 @@
 						<transition name="play" target="sound-screen-21" />
 					</transitions>
 				</input>
-
 				<input type="route-start-carson-colorado" target="map-nevada-rails" next="">
 					<transitions>
 						<transition name="play" target="sound-route-carson-colorado" />
@@ -265,7 +262,7 @@
 		</state>
 		<state id="screen-23-map-us-all">
 			<inputs>
-				<input type="soundComplete" target="sound-screen-23" next="attract-loop">
+				<input type="complete" target="map-us-all" next="attract-loop">
 					<transitions>
 						<transition name="reset" target="map-us-all">
 							<argument type="Boolean" value="true" />
@@ -284,95 +281,97 @@
 			<component type="image" id="nevada-map" />
 			<component type="image" id="text-3" />
 		</component>
-		<component id="intro-1">
+		<component id="screen-4">
 			<component type="sound" id="sound-screen-04" />
 			<component type="image" id="nevada-map" />
-			<component type="caption" id="intro-1-caption" />
+			<component type="caption" id="screen-4-caption" />
 		</component>
-		<component id="intro-2">
+		<component id="screen-5">
 			<component type="sound" id="sound-screen-05" />
 			<component type="image" id="desert" />
 			<component type="background" id="desert" />
-			<component type="caption" id="intro-2-caption" />
+			<component type="caption" id="screen-5-caption" />
 		</component>
-		<component id="map-south-end">
+		<component id="screen-6-map-south-end">
 			<component type="sound" id="sound-screen-06" />
 			<component type="image" id="us-map" />
 			<component type="map" id="map-south-end" />
-			<component type="caption" id="map-south-end-caption" />
+			<component type="caption" id="screen-6-caption" />
 		</component>
-		<component id="map-north-end">
+		<component id="screen-7-map-north-end">
 			<component type="sound" id="sound-screen-07" />
 			<component type="image" id="us-map" />
 			<component type="map" id="map-north-end" />
-			<component type="caption" id="map-north-end-caption" />
+			<component type="caption" id="screen-7-caption" />
 		</component>
-		<component id="map-comparison">
+		<component id="screen-8-map-comparison">
 			<component type="sound" id="sound-screen-08" />
 			<component type="image" id="us-map" />
 			<component type="map" id="map-comparison" />
-			<component type="caption" id="map-comparison-caption" />
+			<component type="caption" id="screen-8-caption" />
 		</component>
-		<component id="comstock">
+		<component id="screen-9-comstock">
 			<component type="sound" id="sound-screen-09" />
 			<component type="image" id="BG-9" />
 			<component type="background" id="comstock-background" />
-			<component type="caption" id="comstock-caption" />
+			<component type="caption" id="screen-9-caption" />
 		</component>
 		<component id="screen-10">
 			<component type="image" id="stained-paper-background" />
 			<component type="background" id="stained-paper-background" />
-			<component type="button" id="screen-10-historical-images" />
+			<component type="button" id="screen-10-view-images" />
 			<component type="button" id="screen-10-resume-story" />
+			<component type="caption" id="screen-10-caption" />
 		</component>
-		<component id="screen-10-historical-images">
+		<component id="screen-11">
 			<component type="image" id="stained-paper-background" />
 			<component type="background" id="stained-paper-background" />
 			<component type="image" id="text-11" />
-			<component type="gallery" id="screen-10-gallery" />
-			<component type="button" id="screen-10-gallery-historical-images" />
-			<component type="button" id="screen-10-gallery-resume-story" />
+			<component type="gallery" id="screen-11-gallery" />
+			<component type="button" id="screen-11-close-photo" />
+			<component type="button" id="screen-11-resume-story" />
 		</component>
 		<component id="screen-13">
 			<component type="image" id="stained-paper-background" />
 			<component type="background" id="stained-paper-background" />
 			<component type="image" id="text-13" />
-			<component type="button" id="screen-13" />
+			<component type="button" id="screen-13-touch-here" />
 		</component>
-		<component id="map-pacific-1">
+		<component id="screen-14-map-pacific">
 			<component type="sound" id="sound-screen-14" />
 			<component type="image" id="us-map" />
 			<component type="map" id="map-pacific" />
 			<component type="image" id="union-logo" />
 			<component type="image" id="pacific-logo" />
-			<component type="caption" id="map-pacific-caption-1" />
+			<component type="caption" id="screen-14-caption" />
 		</component>
-		<component id="map-pacific-2">
+		<component id="screen-15-map-pacific">
 			<component type="sound" id="sound-screen-15" />
 			<component type="image" id="us-map" />
 			<component type="map" id="map-pacific" />
-			<component type="caption" id="map-pacific-caption-2" />
+			<component type="caption" id="screen-15-caption" />
 		</component>
-		<component id="map-pacific-3">
+		<component id="screen-16-map-pacific">
 			<component type="sound" id="sound-screen-16" />
 			<component type="image" id="us-map" />
 			<component type="map" id="map-pacific" />
-			<component type="caption" id="map-pacific-caption-3" />
+			<component type="caption" id="screen-16-caption" />
 		</component>
 		<component id="screen-17">
 			<component type="sound" id="sound-screen-17" />
 			<component type="image" id="blurred-map" />
 			<component type="background" id="blurred-map" />
 			<component type="image" id="text-17" />
-			<component type="button" id="screen-17-historical-images" />
+			<component type="button" id="screen-17-view-images" />
 			<component type="button" id="screen-17-resume-story" />
+			<component type="caption" id="screen-17-caption" />
 		</component>
-		<component id="screen-17-historical-images">
+		<component id="screen-17-gallery">
 			<component type="image" id="stained-paper-background" />
 			<component type="background" id="stained-paper-background" />
 			<component type="image" id="text-11" />
 			<component type="gallery" id="screen-17-gallery" />
-			<component type="button" id="screen-17-gallery-historical-images" />
+			<component type="button" id="screen-17-gallery-close-photo" />
 			<component type="button" id="screen-17-gallery-resume-story" />
 		</component>
 		<component id="screen-18">
@@ -391,10 +390,11 @@
 			<component type="image" id="blurred-map" />
 			<component type="background" id="blurred-map" />
 			<component type="image" id="text-19" />
-			<component type="button" id="screen-19-map-nevada-mines" />
-			<component type="button" id="screen-19-map-nevada-rails" />
+			<component type="button" id="screen-19-view-map" />
+			<component type="button" id="screen-19-resume-story" />
+			<component type="caption" id="screen-19-caption" />
 		</component>
-		<component id="map-nevada-rails">
+		<component id="screen-20-map-nevada-rails">
 			<component type="sound" id="sound-screen-21" />
 			<component type="sound" id="sound-route-carson-colorado" />
 			<component type="sound" id="sound-route-central-pacific" />
@@ -406,6 +406,10 @@
 			<component type="sound" id="sound-route-tonopah-goldfield" />
 			<component type="sound" id="sound-route-virginia-truckee" />
 			<component type="image" id="nevada-map" />
+			<component type="map" id="map-nevada-rails-reverse" />
+			<component type="map" id="map-nevada-mines-reverse" />
+			<component type="map" id="map-nevada-rails" />
+			<component type="map" id="map-nevada-mines" />
 			<component type="image" id="label-map-nevada-rails-virginia-truckee" />
 			<component type="image" id="label-map-nevada-rails-carson-colorado" />
 			<component type="image" id="label-map-nevada-rails-central-pacific" />
@@ -414,12 +418,8 @@
 			<component type="image" id="label-map-nevada-rails-nevada-central" />
 			<component type="image" id="label-map-nevada-rails-nevada-northern" />
 			<component type="image" id="label-map-nevada-rails-tonopah-goldfield" />
-			<component type="map" id="map-nevada-rails-reverse" />
-			<component type="map" id="map-nevada-mines-reverse" />
-			<component type="map" id="map-nevada-rails" />
-			<component type="map" id="map-nevada-mines" />
-			<component type="button" id="screen-21-view-map" />
-			<component type="button" id="screen-21-resume-story" />
+			<component type="button" id="screen-20-back" />
+			<component type="button" id="screen-20-resume-story" />
 		</component>
 		<component id="screen-22">
 			<component type="image" id="blurred-map" />
@@ -478,18 +478,18 @@
 		</map>
 		<!-- The Union and Pacific Rails Map -->
 		<map id="map-pacific" width="2336" height="2808" scroll="true">
-			<overlays>
+			<overlays type="trail">
 				<overlay x="1036.654" y="2086.807" zoom="2" id="sacramento" color="0xFFEA83">
-					<image id="label-sacramento" url="/images/map/label-sacramento.png" x="936.654"  y="2086.807" />
+					<swf id="overlay-sacramento" url="/images/map/overlay-sacramento.swf" x="1049"  y="2059" alpha="0"  />
 				</overlay>
 				<overlay x="1024.525" y="2070.852" zoom="2" id="newcastle" color="0xFFEA83">
-					<image id="label-newcastle" url="/images/map/label-newcastle.png" x="1124.525" y="2070.852" />
+					<swf id="overlay-newcastle" url="/images/map/overlay-newcastle.swf" x="956" y="2043" alpha="0"  />
 				</overlay>
 				<overlay x="985.351" y="2000.412" zoom="2" id="reno" color="0xFFEA83">
-					<image id="label-reno" url="/images/map/label-reno.png" x="885.351"  y="2000.412" />
+					<swf id="overlay-reno" url="/images/map/overlay-reno.swf" x="917"  y="1972" alpha="0" />
 				</overlay>
 				<overlay x="986.601" y="1987.329" zoom="2" id="wadsworth" color="0xFFEA83">
-					<image id="label-wadsworth" url="/images/map/label-wadsworth.png" x="1006.601" y="1987.329" />
+					<swf id="overlay-wadsworth" url="/images/map/overlay-wadsworth.swf" x="1000" y="1956" alpha="0"  />
 				</overlay>
 			</overlays>
 			<routes>
@@ -626,10 +626,17 @@
 			</background>	
 		</map>
 		<map id="map-us-all" width="4879" height="4758" scroll="true">
+			<overlays type="markers">
+				<swf id="overlay-western-pacific" url="/images/map/overlay-western-pacific.swf" x="1852"  y="1803" />
+				<swf id="overlay-central-pacific" url="/images/map/overlay-central-pacific.swf" x="1852" y="2507" />
+				<swf id="overlay-san-pedro" url="/images/map/overlay-san-pedro.swf" x="2576"  y="1734" />
+			</overlays>
 			<routes>
-				<route id="central-pacific" url="/map/routes/transcontinental/central-pacific.json" arclength="30" color="0xffffff" thickness="6" />
-				<route id="san-pedro" url="/map/routes/transcontinental/san-pedro.json" arclength="30" color="0xffffff" thickness="6"  />
-				<route id="western" url="/map/routes/transcontinental/western.json" arclength="30" color="0xffffff" thickness="6" />
+				<routes>
+					<route id="central-pacific" url="/map/routes/transcontinental/central-pacific.json" arclength="10" color="0xffffff" thickness="6" />
+					<route id="san-pedro" url="/map/routes/transcontinental/san-pedro.json" arclength="10" color="0xffffff" thickness="6"  />
+					<route id="western" url="/map/routes/transcontinental/western.json" arclength="10" color="0xffffff" thickness="6" />
+				</routes>
 			</routes>
 			<background>
 				<image id="transcontinental-map" url="/images/map/TRANSCONTINENTAL-MAP.jpg" />
@@ -638,19 +645,20 @@
 	</maps>
 	<galleries>
 		<!-- Screen 10 Gallery -->
-		<gallery id="screen-10-gallery">
+		<gallery id="screen-11">
 			<images>
-				<image id="screen-10-gallery-image-1" name="screen-10-gallery-image-1" url="/images/photo-gallery/Comstock1.jpg" />
-				<image id="screen-10-gallery-image-2" name="screen-10-gallery-image-2" url="/images/photo-gallery/Comstock2.png" />
-				<image id="screen-10-gallery-image-3" name="screen-10-gallery-image-3" url="/images/photo-gallery/Comstock3.jpg" />
-				<image id="screen-10-gallery-image-4" name="screen-10-gallery-image-4" url="/images/photo-gallery/Donner1.jpg" />
-				<image id="screen-10-gallery-image-5" name="screen-10-gallery-image-5" url="/images/photo-gallery/Donner2.jpg" />
-				<image id="screen-10-gallery-image-6" name="screen-10-gallery-image-6" url="/images/photo-gallery/Donner3.jpg" />
-				<image id="screen-10-gallery-image-7" name="screen-10-gallery-image-7" url="/images/photo-gallery/Donner4.jpg" />
+				<image id="screen-11-image-1" name="screen-11-image-1" url="/images/photo-gallery/Comstock1.jpg" />
+				<image id="screen-11-image-2" name="screen-11-image-2" url="/images/photo-gallery/Comstock2.png" />
+				<image id="screen-11-image-3" name="screen-11-image-3" url="/images/photo-gallery/Comstock3.jpg" />
+				<image id="screen-11-image-4" name="screen-11-image-4" url="/images/photo-gallery/Donner1.jpg" />
+				<image id="screen-11-image-5" name="screen-11-image-5" url="/images/photo-gallery/Donner2.jpg" />
+				<image id="screen-11-image-6" name="screen-11-image-6" url="/images/photo-gallery/Donner3.jpg" />
+				<image id="screen-11-image-7" name="screen-11-image-7" url="/images/photo-gallery/Donner4.jpg" />
 			</images>
-				<button id="screen-10-gallery-historical-images" x="1660" y="190">
-					<image id="screen-10-gallery-historical-images" url="/images/Button-Close-Photo.png" />
-				</button>	
+			<button id="screen-11-close-photo" x="1640" y="210">
+				<image id="screen-11-close-photo-down" url="/images/buttons/screen-11/button-close-photo-down.png" />
+				<image id="screen-11-close-photo-up" url="/images/buttons/screen-11/button-close-photo-up.png" />
+			</button>	
 		</gallery>
 		<!-- Screen 17 Gallery -->
 		<gallery id="screen-17-gallery">
@@ -661,9 +669,10 @@
 				<image id="screen-17-gallery-image-11" name="screen-17-gallery-image-11" url="/images/photo-gallery/Mormon4.jpg" />
 				<image id="screen-17-gallery-image-12" name="screen-17-gallery-image-12" url="/images/photo-gallery/Mormon5.jpg" />
 			</images>
-				<button id="screen-17-gallery-historical-images" x="1660" y="190">
-					<image id="screen-17-gallery-historical-images" url="/images/Button-Close-Photo.png" />
-				</button>	
+			<button id="screen-17-gallery-close-photo" x="1640" y="210">
+				<image id="screen-17-gallery-close-photo-down" url="/images/buttons/screen-17-gallery/button-close-photo-down.png" />
+				<image id="screen-17-gallery-close-photo-up" url="/images/buttons/screen-17-gallery/button-close-photo-up.png" />
+			</button>	
 		</gallery>
 	</galleries>
 	<loops>
@@ -675,105 +684,130 @@
 	</loops>
 	<captions>
 		<!-- Introduction - Caption 1 -->
-		<caption id="intro-1-caption" color="0xffffff">
+		<caption id="screen-4-caption" color="0xffffff">
 				<![CDATA[
 In the mid-19th Century, when ideas were developing for a railroad between the eastern United States and the Pacific ...
 				]]>
 		</caption>
 		<!-- Introduction - Caption 2 -->
-		<caption id="intro-2-caption" color="0xffffff">
+		<caption id="screen-5-caption" color="0xffffff">
 				<![CDATA[
 ...people thought the terrain of the <span class="highlight">Sierra Nevada</span> would not allow for the gradual curves and grades a railroad requires.				
 				]]>
 		</caption>
 		<!-- Map South End Caption -->
-		<caption id="map-south-end-caption" color="0xffffff">
+		<caption id="screen-6-caption" color="0xffffff">
 				<![CDATA[
 The first route proposed for a Pacific railroad through the center of the country solved this problem by skirting the south end of the Sierra Nevada.				
 				]]>
 		</caption>
 		<!-- Map North End Caption -->
-		<caption id="map-north-end-caption" color="0xffffff">
+		<caption id="screen-7-caption" color="0xffffff">
 				<![CDATA[
 In 1854 the US Army survey for the railroad route made use of passes at the north end of the Sierra Nevada.				
 				]]>
 		</caption>
 		<!-- Map Comparison Caption -->
-		<caption id="map-comparison-caption" color="0xffffff">
+		<caption id="screen-8-caption" color="0xffffff">
 				<![CDATA[
 And yet, a decade later the Central Pacific Railroad was built through the central Sierra, and over 7,000-foot Donner Pass, instead. Why?			
 				]]>
 		</caption>
 		<!-- The Comstock Caption -->
-		<caption id="comstock-caption" color="0x000000" blend=".8">
+		<caption id="screen-9-caption" color="0x000000" blend=".8">
 				<![CDATA[
 The Comstock Lode, discovered in 1859, offered the economic incentive to accept the high cost of construction through the heart of the mountains.				
 				]]>
 		</caption>
+		<!-- Screen 10 Caption -->
+		<caption id="screen-10-caption" color="0xffffff">
+				<![CDATA[
+Touch <span class="highlight">View Images</span> to see historical images of the Comstock Lode and the construction of Donner Pass.   Touch <span class="highlight">Resume Story</span> to continue. 
+				]]>
+		</caption>
 		<!-- The Union and Pacific Rails Map - Caption 1 -->
-		<caption id="map-pacific-caption-1" color="0xffffff">
+		<caption id="screen-14-caption" color="0xffffff">
 				<![CDATA[
 Two competing companies were building the Pacific railroad. They were to divide its financial rewards based on the mileage each built. The Central Pacific wanted to meet its counterpart, the Union Pacific, as far east as possible.
 				]]>
 		</caption>
 		<!-- The Union and Pacific Rails Map - Caption 2 -->
-		<caption id="map-pacific-caption-2" color="0xffffff">
+		<caption id="screen-15-caption" color="0xffffff">
 				<![CDATA[
 Because of the challenges of crossing the Sierra, the Central Pacific wasn’t completed to Reno until June 1868.				
 				]]>
 		</caption>
 		<!-- The Union and Pacific Rails Map - Caption 3 -->
-		<caption id="map-pacific-caption-3" color="0xffffff">
+		<caption id="screen-16-caption" color="0xffffff">
 				<![CDATA[
 Meanwhile the Union Pacific, building west from Omaha, had constructed three times as many miles of track.  After reaching Reno and the Comstock, the Central Pacific needed to cross Nevada in order to reach its next major market...
 				]]>
 		</caption>
+		<!-- Screen 17 Caption -->
+		<caption id="screen-17-caption" color="0xffffff">
+				<![CDATA[
+Touch <span class="highlight">View Images</span> to see images of Mormon settlement.   Touch <span class="highlight">Resume Story</span> to continue. 
+				]]>
+		</caption>
+		<!-- Screen 19 Caption -->
+		<caption id="screen-19-caption" color="0xffffff">
+				<![CDATA[
+Touch <span class="highlight">View Map</span> to see locations of Nevada's mines.   Touch <span class="highlight">Resume Story</span> to continue. 
+				]]>
+		</caption>
 	</captions>
 	<buttons>
-		<button id="screen-10-historical-images" x="1660" y="190">
-			<image id="screen-10-historical-images" url="/images/Button-View-Photos.png" />
+		<button id="screen-10-view-images" x="1640" y="210">
+			<image id="screen-10-view-images-down" url="/images/buttons/screen-10/button-view-images-down.png" />
+			<image id="screen-10-view-images-up" url="/images/buttons/screen-10/button-view-images-up.png" />
 		</button>	
-		<button id="screen-10-resume-story" x="1660" y="570">
-			<image id="screen-10-resume-story" url="/images/Button-Resume-Story.png" />
+		<button id="screen-10-resume-story" x="1640" y="570">
+			<image id="screen-10-resume-story-down" url="/images/buttons/screen-10/button-resume-story-down.png" />
+			<image id="screen-10-resume-story-up" url="/images/buttons/screen-10/button-resume-story-up.png" />
 		</button>	
-		<button id="screen-10-gallery-historical-images" x="1660" y="190">
-			<image id="screen-10-gallery-historical-images" url="/images/Button-Close-Photos.png" />
+		<button id="screen-11-close-photo" x="1640" y="210">
+			<image id="screen-11-close-photo-down" url="/images/buttons/screen-11/button-close-photo-down.png" />
+			<image id="screen-11-close-photo-up" url="/images/buttons/screen-11/button-close-photo-up.png" />
 		</button>	
-		<button id="screen-10-gallery-resume-story" x="1660" y="570">
-			<image id="screen-10-gallery-resume-story" url="/images/Button-Resume-Story.png" />
+		<button id="screen-11-resume-story" x="1640" y="570">
+			<image id="screen-11-resume-story-down" url="/images/buttons/screen-11/button-resume-story-down.png" />
+			<image id="screen-11-resume-story-up" url="/images/buttons/screen-11/button-resume-story-up.png" />
 		</button>	
-		<button id="screen-13" x="1660" y="380">
-			<image id="screen-13-button" url="/images/Button-View-Map.png" />
+		<button id="screen-13-touch-here" x="1640" y="390">
+			<image id="screen-13-touch-here-down" url="/images/buttons/screen-13/button-touch-here-down.png" />
+			<image id="screen-13-touch-here-up" url="/images/buttons/screen-13/button-touch-here-up.png" />
 		</button>	
-		<button id="screen-17-historical-images" x="1660" y="190">
-			<image id="screen-17-historical-images" url="/images/Button-View-Photos.png" />
+		<button id="screen-17-view-images" x="1640" y="210">
+			<image id="screen-17-view-images-down" url="/images/buttons/screen-17/button-view-images-down.png" />
+			<image id="screen-17-view-images-up" url="/images/buttons/screen-17/button-view-images-up.png" />
 		</button>	
-		<button id="screen-17-resume-story" x="1660" y="570">
-			<image id="screen-17-resume-story" url="/images/Button-Resume-Story.png" />
+		<button id="screen-17-resume-story" x="1640" y="570">
+			<image id="screen-17-resume-story-down" url="/images/buttons/screen-17/button-resume-story-down.png" />
+			<image id="screen-17-resume-story-up" url="/images/buttons/screen-17/button-resume-story-up.png" />
 		</button>	
-		<button id="screen-17-gallery-historical-images" x="1660" y="190">
-			<image id="screen-17-gallery-historical-images" url="/images/Button-Close-Photos.png" />
+		<button id="screen-17-gallery-close-photo" x="1640" y="210">
+			<image id="screen-17-gallery-close-photo-down" url="/images/buttons/screen-17-gallery/button-close-photo-down.png" />
+			<image id="screen-17-gallery-close-photo-up" url="/images/buttons/screen-17-gallery/button-close-photo-up.png" />
 		</button>	
-		<button id="screen-17-gallery-resume-story" x="1660" y="570">
-			<image id="screen-17-gallery-resume-story" url="/images/Button-Resume-Story.png" />
+		<button id="screen-17-gallery-resume-story" x="1640" y="570">
+			<image id="screen-17-gallery-resume-story-down" url="/images/buttons/screen-17-gallery/button-resume-story-down.png" />
+			<image id="screen-17-gallery-resume-story-up" url="/images/buttons/screen-17-gallery/button-resume-story-up.png" />
 		</button>	
-		<button id="screen-19-map-nevada-mines" x="1660" y="190">
-			<image id="screen-19-map-nevada-mines" url="/images/Button-View-Mines.png" />
+		<button id="screen-19-view-map" x="1640" y="210">
+			<image id="screen-19-view-map-down" url="/images/buttons/screen-19/button-view-map-down.png" />
+			<image id="screen-19-view-map-up" url="/images/buttons/screen-19/button-view-map-up.png" />
 		</button>	
-		<button id="screen-19-map-nevada-rails" x="1660" y="570">
-			<image id="screen-19-map-nevada-rails" url="/images/Button-View-Lines.png" />
+		<button id="screen-19-resume-story"x="1640" y="570">
+			<image id="screen-19-resume-story-down" url="/images/buttons/screen-19/button-resume-story-down.png" />
+			<image id="screen-19-resume-story-up" url="/images/buttons/screen-19/button-resume-story-up.png" />
 		</button>	
-		<button id="screen-20-map-nevada-mines" x="1660" y="190">
-			<image id="screen-20-map-nevada-mines" url="/images/Button-View-Mines.png" />
+		<button id="screen-20-back" x="1640" y="210">
+			<image id="screen-20-back-down" url="/images/buttons/screen-20/button-back-down.png" />
+			<image id="screen-20-back-up" url="/images/buttons/screen-20/button-back-up.png" />
 		</button>	
-		<button id="screen-20-resume-story" x="1660" y="570">
-			<image id="screen-20-resume-story" url="/images/Button-Resume-Story.png" />
-		</button>	
-		<button id="screen-21-view-map" x="1660" y="190">
-			<image id="screen-21-view-map" url="/images/Button-View-Map.png" />
-		</button>	
-		<button id="screen-21-resume-story" x="1660" y="570">
-			<image id="screen-21-resume-story" url="/images/Button-Resume-Story.png" />
+		<button id="screen-20-resume-story" x="1640" y="570">
+			<image id="screen-20-resume-story-down" url="/images/buttons/screen-20/button-resume-story-down.png" />
+			<image id="screen-20-resume-story-up" url="/images/buttons/screen-20/button-resume-story-up.png" />
 		</button>	
 	</buttons>
 	<sounds>

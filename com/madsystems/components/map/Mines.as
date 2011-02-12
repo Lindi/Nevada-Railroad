@@ -21,14 +21,14 @@
 		private var overlays:Array ;
 		private var reverse:Boolean ;
 		private var sprites:Array ;
-		private var index:int ;
+		public var index:int ;
 		private var filter:BlurFilter = new BlurFilter( 12, 12, 1 );		
 		
 		public function Mines( overlays:XML, reverse:String, autoPlay:String )
 		{
 			super();
-			this.reverse = ( reverse == "true" ? true : false ) ;
 			
+			this.reverse = ( reverse == "true" ? true : false ) ;
 			this.overlays = new Array( ) ;
 			for each ( var overlay:XML in overlays.overlay ) {
 				this.overlays.push
@@ -41,6 +41,11 @@
 					} 
 				);
 			}
+			
+			if ( reverse )
+				index = overlays.length ;
+			else index = 0 ;
+			
 			//	The paths will draw on this 
 			//	Do we need to add this sprite to the display list
 			//	if we're rendering it to a bitmap
@@ -63,10 +68,10 @@
 			addEventListener( Event.ENTER_FRAME, frame );
 			if ( reverse ) {
 				index = overlays.length -1;
-				hide( overlays.concat());
+				hide( overlays );
 			} else {
 				index = 0 ;
-				display( overlays.concat() ); 
+				display( overlays  ); 
 			}
 		}
 

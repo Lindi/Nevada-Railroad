@@ -32,8 +32,8 @@ package com.madsystems.components.image
 			
 			//	Increment the loader counter
 			++index ;
-			log( "BitmapBuilder.build("+index+")");
-			log( url );
+			trace( "BitmapBuilder.build("+index+")");
+			trace( url );
 					
 			//	Create a bitmap reference to be returned synchrononously
 			bitmap = components[ id ] = new Bitmap( );
@@ -53,24 +53,17 @@ package com.madsystems.components.image
 					
 					//	Extract the bitmap data 
 					var loaderInfo:LoaderInfo = ( event.target as LoaderInfo ) ; 
-					log( "BitmapBuilder.complete("+event+","+index+")");
-					log( loaderInfo.url );
+					trace( "BitmapBuilder.complete("+event+","+index+")");
+					trace( loaderInfo.url );
 					( components[ image.@id ] as Bitmap ).bitmapData = ( loaderInfo.content as Bitmap ).bitmapData ;
 					
 					//	Remove the listener
 					( event.target as LoaderInfo ).removeEventListener
 						( Event.COMPLETE, arguments.callee );
 						
-					//	Dequeue the loaders array and load the next one
-//					if ( loaders.length ) {
-//						var obj:Object = loaders.shift();
-//						( obj.loader as Loader ).load( obj.request as URLRequest );
-//					} else {
-//						dispatcher.dispatchEvent( event.clone());
-//					}
 
-					loaders.pop() ;
-					log( loaders.length );
+					//	Get rid of the loader
+					loaders.splice( loaders.indexOf( loader ), 1 );
 					if (!--index )
 						dispatcher.dispatchEvent( event.clone());
 						
@@ -99,18 +92,14 @@ package com.madsystems.components.image
 				
 			//	If there's nothing in the loader's list
 			//	otherwise, push the request on the list for loading later
-			//if ( !loaders.length ) {
 				try {
 					//	Make the file request and request it
 					loader.load( new URLRequest( url ));
 					loaders.push( loader );
 					
 				} catch (error:Error) {
-					log("Unable to load requested document.");
+					trace("Unable to load requested document.");
 				}	
-//			} else {
-//				loaders.push({ loader: loader, request: new URLRequest( url )});
-//			}
 			return bitmap ;
 			
 		}
@@ -139,20 +128,5 @@ package com.madsystems.components.image
 			return dispatcher.willTrigger( type );
 		}		
 		
-		private function log( message:* ):void 
-		{
-			return ;
-			var myFile:File = File.desktopDirectory.resolvePath("nevada-log.txt");
-		    var fileStream:FileStream = new FileStream();
-		    fileStream.open(myFile, FileMode.READ);
-		    var text:String = fileStream.readUTFBytes(fileStream.bytesAvailable);
-		    fileStream.close();
-
-			text = text + "\n" + String( message );
-		    fileStream.open(myFile, FileMode.WRITE);
-		    
-		    fileStream.writeUTFBytes( text );
-		    fileStream.close();
-		}
 	}
 }

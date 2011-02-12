@@ -8,6 +8,7 @@
 	import com.madsystems.components.map.MapFactory;
 	import com.madsystems.components.sound.SoundFactory;
 	import com.madsystems.components.background.BackgroundFactory;
+	import com.madsystems.components.swf.SwfFactory;
 	
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -18,7 +19,7 @@
 	public class ComponentFactory
 	{
 	
-		protected static var Nevada:DisplayObjectContainer ;
+		protected static var main:DisplayObjectContainer ;
 		public static var factories:Object ;
 		private var dispatchers:Array = new Array( ) ;
 		
@@ -36,6 +37,7 @@
 			factories[ "gallery" ] = new GalleryFactory( );
 			factories[ "sound" ] = new SoundFactory( );
 			factories[ "background" ] = new BackgroundFactory( );
+			factories[ "swf" ] = new SwfFactory( );
 			
 			//	We can do this because we only call this function from one
 			//	place in the application
@@ -43,7 +45,7 @@
 		}
 
 		public function initiatlize( container:DisplayObjectContainer ):ComponentFactory {
-			Nevada = container ;
+			main = container ;
 			for ( var id:String in factories ) {
 				var factory:Object = factories[ id ] ;
 				if ( factory is IEventDispatcher ) {
@@ -56,7 +58,7 @@
 		
 		
 		public static function add( id:String, factory:Object ):void {
-			log( "add("+id+","+factory+")" );
+			trace( "add("+id+","+factory+")" );
 			if ( !factories[ id ] )
 				factories[ id ] = factory ;
 		}
@@ -89,6 +91,7 @@
 		protected function create( xml:XML ):Object { return null ;}		
 
 		private static function log( message:* ):void {
+			return ;
 			var myFile:File = File.desktopDirectory.resolvePath("nevada-log.txt");
 		    var fileStream:FileStream = new FileStream();
 		    fileStream.open(myFile, FileMode.READ);

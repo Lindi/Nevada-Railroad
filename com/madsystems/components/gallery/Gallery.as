@@ -47,6 +47,10 @@
 		override public function next( event:Event ):void {
 			if ( contains( picture ))
 				removeChild( picture );
+				if ( tween ) {
+					tween.stop( );
+					tween = null ;
+				}
 		}
 		/**
 		 * Handle a click on a bitmap
