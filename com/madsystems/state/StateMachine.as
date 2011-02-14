@@ -1,10 +1,10 @@
 ﻿package com.madsystems.state
 {
+	import com.madsystems.state.event.StateEvent;
+	
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
-	import com.madsystems.state.event.StateEvent ;
 	
 
 	public class StateMachine 
@@ -12,10 +12,12 @@
 		public var state:State ;
 		public var states:Object = {};
 		private var nevada:DisplayObjectContainer ;
+		private var transition:StateTransition ;
 		
 		public function StateMachine( nevada:DisplayObjectContainer )
 		{
 			this.nevada = nevada ;
+			this.transition = new StateTransition( nevada ) ;
 			nevada.addEventListener( Event.COMPLETE,
 				function ( event:Event ):void {
 					nevada.removeEventListener( Event.COMPLETE, arguments.callee );
@@ -60,6 +62,11 @@
 
 		public function next( input:Event ):void {
 	
+			//	Pass the outgoing state to the state
+			//	transition object to fade it out
+			if ( state.hasNext( input ))
+				transition.next( state );
+
 			var next:String = state.next( input ) ;
 			trace( "next("+next+")");
 			if ( next ) {
@@ -72,6 +79,7 @@
 				//	id and test for the id of the component that dispatched
 				//	the event
 				removeEventListeners( state );
+				
 
 				//	Store a reference to the new state
 				state = states[ next ] ;
@@ -81,6 +89,9 @@
 				
 				//	Rune the state
 				state.run( ) ;
+
+				//	Fade out the image of the previous state
+				transition.run( );
 			}
 		}
 	}

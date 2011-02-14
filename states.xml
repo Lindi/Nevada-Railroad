@@ -645,7 +645,7 @@
 	</maps>
 	<galleries>
 		<!-- Screen 10 Gallery -->
-		<gallery id="screen-11">
+		<gallery id="screen-11-gallery">
 			<images>
 				<image id="screen-11-image-1" name="screen-11-image-1" url="/images/photo-gallery/Comstock1.jpg" />
 				<image id="screen-11-image-2" name="screen-11-image-2" url="/images/photo-gallery/Comstock2.png" />

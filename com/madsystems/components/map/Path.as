@@ -12,7 +12,7 @@
 		public var sprite:Sprite ;
 		private var paths:Array ;
 		//private var s:Number ;
-		private var index:int = 0 ;
+		public var index:int = 0 ;
 		
 		//	The length that was drawn on the last curve
 		internal var length:Number ;
@@ -67,6 +67,7 @@
 			} else if ( !isNaN( percent )) {
 				index = int( paths.length * percent ) ;
 			} else index = 0 ;
+			length = 0 ;
 		}
 		
 		public function arc(  ):Point  
@@ -94,7 +95,6 @@
 			else length += s ;
 			index = j ;
 			return location ;
-			
 		}
 		
 		private function unwind( ):Point 

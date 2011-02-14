@@ -176,6 +176,7 @@
 						else args.push( cls( argument.@value.toString() ));
 					}
 					
+					
 					//	Push the transition object into the input's transition array
 					array.push( new Transition( target, name, args ));
 

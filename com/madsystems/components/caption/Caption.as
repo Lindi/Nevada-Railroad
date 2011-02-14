@@ -33,15 +33,15 @@ package com.madsystems.components.caption
 
 			var style:StyleSheet = new StyleSheet( );		
 			var highlight:Object = new Object();
-            //highlight.fontWeight = "bold";
-            highlight.color = "#FF0000";
+            highlight.fontWeight = "bold";
+            highlight.color = "#FEE480";
 
 
             style.setStyle(".highlight", highlight);
 
 
 			var format:TextFormat = new TextFormat( );
-			format.font = "Satero Serif LT Pro" ; //myFont.fontName ; //"Satero Serif LT Pro" ; 
+			format.font = "Bookman Old Style" ;//Satero Serif LT Pro" ; //myFont.fontName ; //"Satero Serif LT Pro" ; 
 			format.bold = true ;
 			format.size = 32 ;
 			format.color = color ;
@@ -62,7 +62,7 @@ package com.madsystems.components.caption
 			addEventListener( StateEvent.NEXT, next );
 //			timer = new Timer( 125 );
 //			timer.addEventListener( TimerEvent.TIMER, frame );
-			this.blend = blend ;
+			this.blend = .8;//blend ;
 			
 			tween = new Tween( {}, "", None.easeIn, 0, 1, 1, true ) ;
 			tween.addEventListener( TweenEvent.MOTION_CHANGE, frame ) ;
@@ -93,7 +93,7 @@ package com.madsystems.components.caption
 				return ;
 				
 			textField.alpha = tween.position ;
-			trace( textField.alpha );
+//			trace( textField.alpha );
 //			var index:int = caption.indexOf(" ");
 //			if ( index != -1 ) {
 //				html += caption.substr(0,index) + " " ;
@@ -109,7 +109,7 @@ package com.madsystems.components.caption
 			var x:int = textField.x/2 ;
 			var w:int = ( textField.x - textField.x/2 );
 			sprite.graphics.clear();
-			sprite.graphics.beginFill( 0xffffff, blend );
+			sprite.graphics.beginFill( 0x000000, blend );
 			sprite.graphics.drawRect( x, 0, 2 * w + textField.textHeight, stage.stageHeight );
 			sprite.graphics.endFill();
 			

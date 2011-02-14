@@ -79,6 +79,9 @@
 //			sprite.filters = [ filter ] ;
 //			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
 //			sprites.push( sprite ) ;
+
+
+
 			sprite = new Sprite( );
 			if ( !scroll ) {
 				sprite.x = x ;
@@ -167,7 +170,7 @@
 
 
 		public function reset( reset:Boolean ):void {
-			if ( reset ) {
+			//if ( reset ) {
 				//	Clear the sprite
 				for each ( var sprite:Sprite in sprites )
 					sprite.graphics.clear();
@@ -176,28 +179,30 @@
 				index = 0 ;
 				
 				//	Reset the paths
-				//	This should be conditional
-				(function ( paths:Array ):void {
+				(function( paths:Array ):void {
 					for each ( var path:* in paths ) {
 						if ( path is Array )
-							arguments.callee( path );
-						else ( path as Path ).reset() ;					
+							arguments.callee( path as Array );
+						else ( path as Path ).reset( ) ;					
 					}
-				})( paths );
-				visible = true ;
-			}
+				})( this.paths );
+				
+				
+				//visible = true ;
+				alpha = 1 ;
+			//}
 			
 		}
 		
-		public function predraw( ):void {
-			for each ( var sprite:Sprite in sprites )
-				sprite.graphics.clear();
-			var object:Object ;
-			var j:int= 0 ;
-			while ( j < index ) 
-				draw( 1, paths[ j++ ] );
-			
-		}
+//		public function predraw( ):void {
+//			for each ( var sprite:Sprite in sprites )
+//				sprite.graphics.clear();
+//			var object:Object ;
+//			var j:int= 0 ;
+//			while ( j < index ) 
+//				draw( 1, paths[ j++ ] );
+//			
+//		}
 //		public function unwind( ):void {
 //			
 //			//	Reset the paths
@@ -244,7 +249,6 @@
 			if ( autoStop ) {
 				stop( );	
 			}
-			
 		}
 		
 		public function stop( event:Event = null ):void {
@@ -278,7 +282,10 @@
 				//	Pan and zoom the map if scrolling is enabled
 				if ( scroll ) {
 					//	Modify this to get rid of map ripple	
-					zoom += ( scale - zoom ) * .0625 ;
+					
+					if ( Math.abs( scale - zoom ) < .0001 )
+						zoom = scale ;
+					else zoom += ( scale - zoom ) * .0625 ;
 
 
 					//	Scale the point
@@ -320,39 +327,6 @@
 		
 		
 		
-//		private function overlay( overlays:Array, location:Point, sprite:Sprite ):void {
-//			
-//			//	Kill the line style
-//			sprite.graphics.lineStyle( );
-//			
-//			//	Go through each overlay
-//			//	If the current zoom is greater than 
-//			//	or equal to the current zoom threshold
-//			//	and the current location is close enough
-//			//	the location point, display it
-//			//	Hide each currently visible overlay
-//			//	that doesn't meet those conditions
-//			for ( var i:int = 0; i < overlays.length; i++ ) {
-//				var overlay:Object = overlays[ i];
-//				var x0:Number = overlay.x - overlays[0].x ;
-//				var y0:Number = overlay.y - overlays[0].y ;
-//				var dx:Number = location.x - overlays[0].x ;
-//				var dy:Number = location.y - overlays[0].y ;
-//				var show:Boolean = ( zoom >= overlay.zoom ) ;
-//				show = show &&  (( dx * dx + dy * dy ) > ( x0 * x0 + y0 * y0 )); 
-//				overlay.alpha += ( Number( show ) - overlay.alpha ) * .5 ;
-//				( overlay.image.bitmap as DisplayObject ).alpha = overlay.alpha ;
-//				( overlay.image.bitmap as DisplayObject ).x = overlay.image.x ; // * zoom ;
-//				( overlay.image.bitmap as DisplayObject ).y = overlay.y - ( overlay.image.bitmap as DisplayObject ).height/2 ; //overlay.image.y ; // * zoom ;
-//				sprite.graphics.beginFill( overlay.color, overlay.alpha ) ;
-//				sprite.graphics.drawCircle( overlay.x, overlay.y, 5 );
-//				sprite.graphics.endFill( );
-//				if ( show && !sprite.contains( overlay.image.bitmap as DisplayObject ))
-//					sprite.addChild( overlay.image.bitmap as DisplayObject );
-//				else if ( !show && sprite.contains( overlay.image.bitmap as DisplayObject ))
-//					sprite.removeChild( overlay.image.bitmap  as DisplayObject );
-//			}
-//		}
 		
 		private function arc( object:* ):Point {
 			var point:Point ;

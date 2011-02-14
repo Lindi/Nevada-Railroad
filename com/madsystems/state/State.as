@@ -6,8 +6,7 @@
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher ;
-	import com.madsystems.state.ITransition ;
+	import flash.events.IEventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
@@ -36,7 +35,6 @@
 			components = new Array( );
 			inputs = new Object( );
 			if ( timeout ) {
-				trace( "id " + id + " timeout " + timeout );
 				timer = new Timer( timeout, 1 );
 				timer.addEventListener( TimerEvent.TIMER_COMPLETE, this.timeout );
 			}
@@ -68,16 +66,42 @@
 			
 		}
 		
+		
+		private function getInput( event:Event ):Array {
+			//	Find the right row of the input table
+			for ( var type:String in inputs ) {
+				if ( type == event.type ) {
+					return inputs[ type ] ;
+				}
+			}
+			return null ;			
+		}
+		
+		internal function hasNext( event:Event ):Boolean {
+			//	Find the right row of the input table
+			//	Of course you should factor this out as a method
+			var input:Array = getInput( event );
+			if ( !input )
+				return false ;
+				
+			//	Find the next state
+			for ( var i:int = 0; i < input.length; i++ ) {
+				var component:Object = components[ input[ i ].component ] ;
+				if ( event.target === component && ( input[i].next as String ).length )
+					return true ;
+			}
+			return false ;
+		}
 		public function next( event:Event ):String {
 			trace( "next("+event+")");
 			//	Find the right row of the input table
-			var input:Array ;
-			for ( var type:String in inputs ) {
-				if ( type == event.type ) {
-					input = inputs[ type ] ;
-					break ;
-				}
-			}
+			var input:Array = getInput( event );
+//			for ( var type:String in inputs ) {
+//				if ( type == event.type ) {
+//					input = inputs[ type ] ;
+//					break ;
+//				}
+//			}
 					
 			if ( input ) {
 				

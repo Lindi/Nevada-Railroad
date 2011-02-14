@@ -11,9 +11,7 @@
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.filters.BlurFilter;
-	import flash.geom.ColorTransform;
 	import flash.utils.Timer;
-	import flash.events.IEventDispatcher ;
 
 
 	internal class Mines extends Component
@@ -23,6 +21,7 @@
 		private var sprites:Array ;
 		public var index:int ;
 		private var filter:BlurFilter = new BlurFilter( 12, 12, 1 );		
+		private var timer:Timer ;
 		
 		public function Mines( overlays:XML, reverse:String, autoPlay:String )
 		{
@@ -37,7 +36,8 @@
 						cx: Number( overlay.@cx.toString()),
 						cy: Number( overlay.@cy.toString()), 
 						r: Number( overlay.@r.toString()),
-						alpha: ( this.reverse ? 1 : 0 )
+						alpha: ( this.reverse ? 1 : 0 ),
+						fill: Number( overlay.@fill.toString())
 					} 
 				);
 			}
@@ -50,15 +50,18 @@
 			//	Do we need to add this sprite to the display list
 			//	if we're rendering it to a bitmap
 			sprites = new Array( );
-			var sprite:Sprite = addChild( new Sprite( )) as Sprite ;
-			sprite.filters = [ filter ] ;
-			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
-			sprites.push( sprite ) ;
+//			var sprite:Sprite = addChild( new Sprite( )) as Sprite ;
+//			sprite.filters = [ filter ] ;
+//			sprite.transform.colorTransform = new ColorTransform( 1, 0, 0, .7 );
+//			sprites.push( sprite ) ;
 			sprites.push( addChild( new Sprite( )));
 			
 			if ( autoPlay == "true" )
 				addEventListener( StateEvent.RUN, run );
 			addEventListener( StateEvent.NEXT, next );
+			
+			timer = new Timer( 125, 1 );
+			timer.addEventListener( TimerEvent.TIMER_COMPLETE, tick );
 		}
 		
 
@@ -73,6 +76,21 @@
 				index = 0 ;
 				display( overlays  ); 
 			}
+			timer.start( );
+
+		}
+		
+		private function tick( event:TimerEvent ):void {
+			timer.stop( );
+			if ( reverse ) {
+				if ( --index > -1 ) {
+					hide( overlays );
+					timer.start( ) ;
+				}
+			} else if ( ++index < overlays.length ) {
+				display( overlays );
+				timer.start( );
+			}
 		}
 
 		override public function run(event:Event):void {
@@ -84,76 +102,61 @@
 			for each ( var overlay:Object in overlays ) {
 				if ( overlay.tween ) {
 					( overlay.tween as Tween ).stop( );
-					overlay.tween = null ;
 				}
+				if ( reverse )
+					overlay.alpha = 1 ;
+				else overlay.alpha = 0 ;
 			}
-			if ( hasEventListener( Event.ENTER_FRAME ))
-				removeEventListener( Event.ENTER_FRAME, frame );
+			removeEventListener( Event.ENTER_FRAME, frame );
+			
+			//	First, clear the sprites
+			for each ( var sprite:Sprite in sprites ) 
+				sprite.graphics.clear();
+			alpha = 1 ;
+			timer.stop( ) ;
 		}
 		 
 		private function hide( overlays:Array ):void {
+			if ( reverse )
+				trace( "index: " + index ) ;
 			var overlay:Object = overlays[ index ];
-			var tween:Tween = overlay.tween = new Tween( overlay, "alpha", Regular.easeIn, 1, 0, 1, true ) ;
-			var listener:Function = function ( event:TweenEvent ):void {
-				if ( event.type == TweenEvent.MOTION_FINISH ) {
-					overlay.tween = null ;
-					( event.target as Tween ).removeEventListener
-						( TweenEvent.MOTION_CHANGE, arguments.callee );
-					( event.target as Tween ).removeEventListener
-						( TweenEvent.MOTION_FINISH, arguments.callee );
-					tween.stop( );
-					tween = null ;
-					
+			if ( !overlay.tween ) {
+				var tween:Tween = overlay.tween = new Tween( overlay, "alpha", Regular.easeIn, 1, 0, 1, true ) ;
+				var listener:Function = function ( event:TweenEvent ):void {
+					if ( event.type == TweenEvent.MOTION_FINISH ) {
+						( event.target as Tween ).removeEventListener
+							( TweenEvent.MOTION_CHANGE, arguments.callee );
+						( event.target as Tween ).removeEventListener
+							( TweenEvent.MOTION_FINISH, arguments.callee );
+						( event.target as Tween ).stop( );
+					}
 				}
+				tween.addEventListener( TweenEvent.MOTION_CHANGE, listener ) ;
+				tween.addEventListener( TweenEvent.MOTION_FINISH, listener ) ;
+				tween.start( );
+			} else {
+				( overlay.tween as Tween ).start( );
 			}
-			tween.addEventListener( TweenEvent.MOTION_CHANGE, listener ) ;
-			tween.addEventListener( TweenEvent.MOTION_FINISH, listener ) ;
-			tween.start();
-			
-			
-			if ( --index > -1 ) {
-				var timer:Timer = new Timer( 125, 1 );
-				timer.addEventListener( TimerEvent.TIMER_COMPLETE,
-					function ( event:TimerEvent ):void {
-						timer.stop( );
-						hide( overlays );
-						( event.target as IEventDispatcher ).removeEventListener
-							( event.type, arguments.callee );
-					});	
-				timer.start( );
-			}			
 		}
-		private function display( overlays:Array ):void {
-
-
+		private function display( overlays:Array ):void 
+		{
 			var overlay:Object = overlays[ index ];
-			var tween:Tween = overlay.tween = new Tween( overlay, "alpha", Regular.easeIn, 0, 1, 1, true ) ;
-			var listener:Function = function ( event:TweenEvent ):void {
-				if ( event.type == TweenEvent.MOTION_FINISH ) {
-					overlay.tween = null ;
-					( event.target as Tween ).removeEventListener
-						( TweenEvent.MOTION_CHANGE, arguments.callee );
-					( event.target as Tween ).removeEventListener
-						( TweenEvent.MOTION_FINISH, arguments.callee );
-					tween.stop( );
-					tween = null ;
+			if ( !overlay.tween ) {
+				var tween:Tween = overlay.tween = new Tween( overlay, "alpha", Regular.easeIn, 0, 1, 1, true ) ;
+				var listener:Function = function ( event:TweenEvent ):void {
+					if ( event.type == TweenEvent.MOTION_FINISH ) {
+						( event.target as Tween ).removeEventListener
+							( TweenEvent.MOTION_CHANGE, arguments.callee );
+						( event.target as Tween ).removeEventListener
+							( TweenEvent.MOTION_FINISH, arguments.callee );
+						( event.target as Tween ).stop( );
+					}
 				}
-			}
-			tween.addEventListener( TweenEvent.MOTION_CHANGE, listener ) ;
-			tween.addEventListener( TweenEvent.MOTION_FINISH, listener ) ;
-			tween.start();
-			
-			
-			if ( ++index < overlays.length ) {
-				var timer:Timer = new Timer( 125, 1 );
-				timer.addEventListener( TimerEvent.TIMER_COMPLETE,
-					function ( event:TimerEvent ):void {
-						timer.stop( );
-						display( overlays );
-						( event.target as IEventDispatcher ).removeEventListener
-							( event.type, arguments.callee );
-					});	
-				timer.start( );
+				tween.addEventListener( TweenEvent.MOTION_CHANGE, listener ) ;
+				tween.addEventListener( TweenEvent.MOTION_FINISH, listener ) ;
+				tween.start( );
+			} else {
+				( overlay.tween as Tween ).start( );
 			}
 		}
 		
@@ -168,7 +171,7 @@
 				var overlay:Object = overlays[ i] ;
 				finished = finished && ( reverse ? overlay.alpha == 0 : overlay.alpha == 1 );
 				for each ( sprite in sprites ) {
-					sprite.graphics.beginFill( 0xffffff, overlay.alpha );
+					sprite.graphics.beginFill( overlay.fill, overlay.alpha );
 					sprite.graphics.drawCircle( overlay.cx, overlay.cy, overlay.r );
 					sprite.graphics.endFill();
 				}

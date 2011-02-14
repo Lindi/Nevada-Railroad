@@ -15,7 +15,10 @@ package com.madsystems.state
 		
 		public function execute( ):void
 		{
-			( target[ name ] as Function ).apply( target, args );	
+			if ( target[ name ] as Function )
+				( target[ name ] as Function ).apply( target, args );	
+			else if ( target.hasOwnProperty( name ))
+				( target[ name ] = args[0] ) ;
 		}
 	}
 }
