@@ -64,12 +64,12 @@
 	
 			//	Pass the outgoing state to the state
 			//	transition object to fade it out
-			if ( state.hasNext( input ))
+			if ( state.hasNext( input ) || input.type == StateEvent.TIMEOUT )
 				transition.next( state );
 
 			var next:String = state.next( input ) ;
-			trace( "next("+next+")");
 			if ( next ) {
+				trace( "next("+next+")");
 				//	Remove event listeners from the state
 				//	This should be refactored to allow many components
 				//	for one input type

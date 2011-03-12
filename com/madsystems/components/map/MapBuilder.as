@@ -39,9 +39,10 @@
 							var thickness:Number = Number( route.@thickness.toString() );
 							var arclength:Number = Number( route.@arclength.toString() );
 							var percent:Number = Number( route.@percent.toString( ));
+							var delay:Number = Number( route.@delay.toString( ));
 							var erase:Boolean = ( route.@erase.toString( ) == "true" ? true : false );
 							var id:String = route.@id.toString( );
-							array.push( { url: url, color: color, thickness: thickness, id: id, arclength: arclength, percent: percent, erase: erase });
+							array.push( { url: url, color: color, thickness: thickness, id: id, arclength: arclength, percent: percent, delay: delay, erase: erase });
 						}
 					}
 					return array ;

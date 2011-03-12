@@ -1,11 +1,11 @@
 ﻿package com.madsystems.components.map
 {
+	import flash.display.CapsStyle;
 	import flash.display.Graphics;
+	import flash.display.JointStyle;
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import flash.display.CapsStyle ;
-	import flash.display.JointStyle ;
 	
 	public class Path
 	{
@@ -22,6 +22,7 @@
 		
 		
 		internal var location:Point ;
+		internal var delay:int = 0 ;
 		private var thickness:int ;
 		private var color:Number ;
 		private var percent:Number = 0 ;
@@ -40,7 +41,8 @@
 			this.location = new Point( );
 			this.length = this.s = ( properties.arclength ? properties.arclength : 5 ) ;
 			this.thickness = ( properties.hasOwnProperty( "thickness" ) ? int( properties.thickness ) : 1 ) ;
-			this.percent = properties.percent ; //( !isNaN( properties.percent ) ? properties.percent : 0 );
+			this.percent = ( !isNaN( properties.percent ) ? properties.percent : 0 );
+			this.delay = ( !isNaN( properties.delay ) ? properties.delay : 0 );
 			this.erase = ( properties.hasOwnProperty("erase") ? properties.erase : false );
 			reset( );
 			this.color = ( properties.hasOwnProperty( "color" ) ? Number( properties.color ) : 0xffffff ) ;

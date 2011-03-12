@@ -11,6 +11,8 @@
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
+	import flash.events.TimerEvent;
 	import flash.filters.BlurFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -21,7 +23,7 @@
 	{
 		public var paths:Array ;
 		public var maps:Array ;
-		private var index:int = 0 ;
+		public var index:int = 0 ;
 		//internal var sprite:Sprite ;
 		private var zoom:Number ;
 		private var scroll:Boolean ;
@@ -154,6 +156,7 @@
 							thickness: element.thickness,
 							arclength: element.arclength,
 							percent: element.percent,
+							delay: element.delay,
 							erase: element.erase,
 							id: element.id
 						};
@@ -194,40 +197,6 @@
 			
 		}
 		
-//		public function predraw( ):void {
-//			for each ( var sprite:Sprite in sprites )
-//				sprite.graphics.clear();
-//			var object:Object ;
-//			var j:int= 0 ;
-//			while ( j < index ) 
-//				draw( 1, paths[ j++ ] );
-//			
-//		}
-//		public function unwind( ):void {
-//			
-//			//	Reset the paths
-//			//	This should be conditional
-//			var p:Array = [];
-//			p.push
-//			(
-//				(function ( paths:Array, bin:Array ):Array {
-//					while ( paths.length ) {
-//						var path:* = paths.pop();
-//						if ( path is Array ) {
-//							return arguments.callee( path, bin );
-//						} else {
-//							bin.unshift( path );
-//							//( path as Path ).length = 3 ;
-//							( path as Path ).erase = true ;
-//							( path as Path ).reset() ;
-//						}					
-//					}
-//					return bin ;
-//				})( this.paths, [] )
-//			)
-//			this.paths = p ;
-//			index = 0 ;
-//		}
 		override public function run( event:Event ):void {
 			trace("run("+event+")");
 			if ( autoStart )
@@ -362,8 +331,37 @@
 			if ( !marked )
 				return false ;
 			if ( ++index < paths.length ) {
-				start( paths[ index ] );
-				return false ;
+				
+				object = paths[ index ] ;
+				if ( object is Array )
+					path = object[ 0] as Path ;
+				else path = ( object as Path ) ;
+				
+				//	If we're delaying the start of drawing the path
+				if ( path.delay > 0 ) {
+					
+					//	Kill the frame listener
+					if ( hasEventListener( Event.ENTER_FRAME ))
+						removeEventListener( Event.ENTER_FRAME, frame );
+						
+					//	Delay the start of the drawing	
+					var t:Timer = new Timer( path.delay, 1 );
+					t.addEventListener( TimerEvent.TIMER_COMPLETE,
+						function ( event:TimerEvent ):void {
+							
+							//	Remove the event listener
+							( event.target as IEventDispatcher )
+								.removeEventListener( event.type, arguments.callee );
+								
+							//	Start the path
+							start( paths[ index ] );
+						});	
+					t.start();				
+					return false ;
+				} else  { 
+					start( paths[ index ] );
+					return false ;
+				}
 			}
 			return true ;
 			
@@ -385,7 +383,12 @@
 					dispatchEvent( new Event( event ));
 					type = event ;
 				}
-			}			
+			}	
+			
+			//	Start listening for frame events again
+			//	if we stopped because this path was delayed
+			if ( !hasEventListener( Event.ENTER_FRAME ))
+				addEventListener( Event.ENTER_FRAME, frame );		
 		}
 		
 		public function fade( alpha:Number, id:String ):void {

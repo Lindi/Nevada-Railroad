@@ -41,18 +41,20 @@ package com.madsystems.state
 		internal function next( state:State ):void {
 			bitmap.alpha = 1 ;
 			bitmap.bitmapData.fillRect( bitmap.bitmapData.rect, 0 );
-			for ( var i:int = 0; i < state.uicomponent.numChildren; i++) {
-				var child:IBitmapDrawable = ( state.uicomponent.getChildAt( i ) as IBitmapDrawable );
-				var x:Number = ( child as DisplayObject ).x ;
-				var y:Number = ( child as DisplayObject ).y ;
-				var scaleX:Number = ( child as DisplayObject ).scaleX ;
-				var scaleY:Number = ( child as DisplayObject ).scaleY ;
-				matrix.identity() ;
-				matrix.scale( scaleX, scaleY );
-				matrix.tx = x ;
-				matrix.ty = y ;
-				bitmap.bitmapData.draw( child, matrix, new ColorTransform( 1, 1, 1, ( child as DisplayObject ).alpha ));
-			}
+			bitmap.bitmapData.draw( state.uicomponent );
+			
+//			for ( var i:int = 0; i < state.uicomponent.numChildren; i++) {
+//				var child:IBitmapDrawable = ( state.uicomponent.getChildAt( i ) as IBitmapDrawable );
+//				var x:Number = ( child as DisplayObject ).x ;
+//				var y:Number = ( child as DisplayObject ).y ;
+//				var scaleX:Number = ( child as DisplayObject ).scaleX ;
+//				var scaleY:Number = ( child as DisplayObject ).scaleY ;
+//				matrix.identity() ;
+//				matrix.scale( scaleX, scaleY );
+//				matrix.tx = x ;
+//				matrix.ty = y ;
+//				bitmap.bitmapData.draw( child, matrix, new ColorTransform( 1, 1, 1, ( child as DisplayObject ).alpha ));
+//			}
 		}
 		
 		private function frame( event:TweenEvent ):void {

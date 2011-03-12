@@ -57,6 +57,7 @@ package com.madsystems.components.caption
 			textField.x = 80 ;
 			textField.y = 1000 ;
 			textField.styleSheet = style ;
+			textField.selectable = false ;
 			sprite = new Sprite( );
 			addEventListener( StateEvent.RUN, run );
 			addEventListener( StateEvent.NEXT, next );
